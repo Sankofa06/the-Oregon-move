@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A private-by-design family planner for a move to the Hillsboro or Tigard area by September 2027.">
+  <meta name="description" content="A private-by-design family decision board for a 2027 move to Oregon's west and southwest Portland metro.">
   <meta name="theme-color" content="#173f35">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'">
   <meta property="og:title" content="The Oregon Move">
-  <meta property="og:description" content="Four housing paths, one family timeline, and a privacy-safe decision plan.">
-  <title>The Oregon Move — family decision planner</title>
+  <meta property="og:description" content="A map, four housing paths, two private local models, and one editable 2027 roadmap.">
+  <title>The Oregon Move — family decision board</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./overrides.css">
 </head>
@@ -19,206 +19,137 @@
 
   <header class="site-header">
     <div class="nav-shell">
-      <a class="wordmark" href="#main" aria-label="The Oregon Move, home">
-        <span class="mark" aria-hidden="true">OR</span>
-        <span>The Oregon Move</span>
-      </a>
-      <nav aria-label="Planner sections">
-        <a href="#paths">Paths</a>
-        <a href="#sale">Home sale</a>
-        <a href="#places">Places + work</a>
-        <a href="#roadmap">Roadmap</a>
-      </nav>
+      <a class="wordmark" href="#main" aria-label="The Oregon Move, home"><span class="mark" aria-hidden="true">OR</span><span>The Oregon Move</span></a>
+      <nav aria-label="Planner sections"><a href="#paths">Paths</a><a href="#sale">Home sale</a><a href="#places">Explore</a><a href="#roadmap">Roadmap</a></nav>
       <a class="source-link" href="https://github.com/Sankofa06/the-Oregon-move" rel="noopener noreferrer">View source on GitHub <span aria-hidden="true">↗</span></a>
     </div>
     <div class="privacy-strip" role="note">
-      <div>
-        <strong id="mode-label">Illustrative example</strong>
-        <span>Private values stay in this browser only when you choose “Save on this device.” This planner does not upload them. Browser storage is not a vault and may be readable by other pages on the same site origin. Do not enter names, addresses, account or loan numbers, credentials, or resume contact details.</span>
-      </div>
+      <div><strong id="mode-label">Illustrative example</strong><span>The live Pages URL is public. Private models stay in this browser only when you opt in to saving; this site does not upload them.</span></div>
       <button id="privacy-more" class="text-button" type="button" aria-controls="privacy-details" aria-expanded="false">Privacy details</button>
     </div>
-    <div id="privacy-details" class="privacy-details" hidden>
-      The public Pages link shares the empty planner and rounded example—not your populated plan. Use the separate JSON export to share values across devices. That file is unencrypted and should be handled as private financial material.
-    </div>
+    <div id="privacy-details" class="privacy-details" hidden>Browser storage is not a vault or a shared account. Do not enter names, street addresses, account or loan numbers, credentials, or resume contact details. “My model” and “Partner model” are separate browser slots, not secure cross-device sync. JSON export is unencrypted and is the manual handoff method.</div>
   </header>
 
   <main id="main">
     <section class="hero section-shell" aria-labelledby="hero-title">
-      <div class="eyebrow">West side / Portland metro / 2027</div>
+      <div class="eyebrow">West + southwest Portland metro / 2027</div>
       <div class="hero-grid">
-        <div>
-          <h1 id="hero-title">One clear route<br>to <em>our Oregon life.</em></h1>
-          <p class="lede">A couple-friendly decision board for career, cash, our current-home exit, and four honest housing paths around Hillsboro and Tigard.</p>
-        </div>
-        <aside class="month-card" aria-labelledby="month-heading">
-          <span class="pin" aria-hidden="true"></span>
-          <p class="card-kicker" id="month-heading">What needs attention now</p>
-          <p class="next-action" id="next-action">Reconcile the household baseline.</p>
-          <p class="next-meta" id="next-action-meta">Foundation · both · due Sep 30</p>
-          <a href="#roadmap" class="arrow-link">Open the roadmap <span aria-hidden="true">→</span></a>
-        </aside>
+        <div><h1 id="hero-title">One clear route<br>to <em>our Oregon life.</em></h1><p class="lede">A visual decision board for two careers, the current-home exit, debt cleanup, school timing, and four honest housing paths.</p></div>
+        <aside class="month-card" aria-labelledby="month-heading"><span class="pin" aria-hidden="true"></span><p class="card-kicker" id="month-heading">What needs attention now</p><p class="next-action" id="next-action">Reconcile the household baseline.</p><p class="next-meta" id="next-action-meta">Foundation · both · due Sep 30</p><a href="#roadmap" class="arrow-link">Open the Gantt <span aria-hidden="true">→</span></a></aside>
       </div>
 
       <div class="status-rail" aria-label="Plan status">
-        <div class="status-cell">
-          <span>Physical move window</span>
-          <strong>Aug 21–27, 2027</strong>
-          <small>Before the school-ready checkpoint</small>
-        </div>
-        <div class="status-cell">
-          <label for="target-date">School-ready milestone</label>
-          <input id="target-date" type="date" value="2027-09-01" data-path="targetMoveDate">
-          <small id="days-remaining">— days to plan</small>
-        </div>
-        <div class="status-cell">
-          <label for="career-status">Career gate</label>
-          <select id="career-status" data-path="career.status">
-            <option value="researching">Researching</option>
-            <option value="applying">Applying</option>
-            <option value="interviewing">Interviewing</option>
-            <option value="offer-accepted">Offer accepted</option>
-            <option value="employed">Employed</option>
-          </select>
-          <small id="career-note">Income is not yet secured for this move.</small>
-        </div>
-        <div class="status-cell">
-          <label for="destination-focus">Place focus</label>
-          <select id="destination-focus" data-path="destinationFocus">
-            <option value="both">Compare both</option>
-            <option value="hillsboro">Hillsboro</option>
-            <option value="tigard">Tigard</option>
-          </select>
-          <small>City focus is editable; school fit is address-specific.</small>
-        </div>
+        <div class="status-cell"><span>Physical move window</span><strong>Aug 21–27, 2027</strong><small>Working window; keep a backup week.</small></div>
+        <div class="status-cell"><label for="target-date">Family-settled milestone</label><input id="target-date" type="date" value="2027-09-01" data-path="targetMoveDate"><small id="days-remaining">— days to plan</small></div>
+        <div class="status-cell"><label for="career-status">Career gate</label><select id="career-status" data-path="career.status"><option value="researching">Researching</option><option value="applying">Applying</option><option value="interviewing">Interviewing</option><option value="offer-accepted">Offer accepted</option><option value="employed">Employed</option></select><small id="career-note">Income is not yet secured for this move.</small></div>
+        <div class="status-cell"><label for="destination-focus">Search focus</label><select id="destination-focus" data-path="destinationFocus"><option value="both">Explore the full map</option><option value="hillsboro">Intel / west side</option><option value="tigard">Southwest / Tualatin</option></select><small>Worksite and actual route come before a town winner.</small></div>
+      </div>
+
+      <div class="workspace-panel">
+        <fieldset class="workspace-switch"><legend>Choose the view you are editing</legend>
+          <label><input type="radio" name="workspace" value="example" checked> Public example</label>
+          <label><input type="radio" name="workspace" value="mine"> My model</label>
+          <label><input type="radio" name="workspace" value="partner"> Partner model</label>
+        </fieldset>
+        <p>Each private model has its own local save, shortlist, timeline status, and assumptions. Switch freely; use export/import to hand a copy to another device.</p>
       </div>
 
       <div class="plan-controls" aria-labelledby="private-tools-heading">
-        <div>
-          <p class="card-kicker" id="private-tools-heading">Private planning tools</p>
-          <p id="save-status" class="save-status" aria-live="polite">Illustrative example · nothing has been stored.</p>
-        </div>
+        <div><p class="card-kicker" id="private-tools-heading">Active workspace tools</p><p id="save-status" class="save-status" aria-live="polite">Illustrative example · nothing has been stored.</p></div>
         <div class="control-actions">
-          <button id="start-private" class="button primary" type="button">Start a private plan</button>
-          <label class="check-control"><input id="save-device" type="checkbox" disabled> Save on this device</label>
-          <label class="check-control"><input id="hide-values" type="checkbox"> Hide dollar values</label>
-          <button id="export-plan" class="button secondary" type="button" disabled>Export JSON</button>
-          <button id="import-trigger" class="button secondary" type="button">Import JSON</button>
+          <label class="check-control"><input id="save-device" type="checkbox" disabled> Save this model on this device</label>
+          <label class="check-control"><input id="hide-values" type="checkbox" disabled> Hide private values</label>
+          <button id="export-plan" class="button secondary" type="button" disabled>Export this model</button>
+          <button id="import-trigger" class="button secondary" type="button" disabled>Import into this model</button>
           <input id="import-file" class="visually-hidden" type="file" accept="application/json,.json" aria-label="Choose private plan JSON file" tabindex="-1">
-          <button id="clear-plan" class="button danger" type="button" disabled>Clear private plan</button>
+          <button id="clear-plan" class="button danger" type="button" disabled>Clear this model</button>
         </div>
-        <div id="conflict" class="conflict" hidden role="status">
-          <p>A newer saved copy exists in another tab. This tab was not overwritten.</p>
-          <button id="load-conflict" type="button" class="button secondary">Load newer saved copy</button>
-          <button id="keep-conflict" type="button" class="button secondary">Keep this tab</button>
-        </div>
+        <div id="conflict" class="conflict" hidden role="status"><p>A newer saved copy exists in another tab. This tab was not overwritten.</p><button id="load-conflict" type="button" class="button secondary">Load newer copy</button><button id="keep-conflict" type="button" class="button secondary">Keep this version</button></div>
       </div>
     </section>
 
     <section id="paths" class="section-shell path-section" aria-labelledby="paths-title">
-      <div class="section-heading">
-        <div><span class="eyebrow">Four parallel routes</span><h2 id="paths-title">Compare the paths.<br><em>Choose the focus together.</em></h2></div>
-        <p>No score, rank, or automatic winner. “Focus” means currently exploring, not recommended. Every figure below uses rounded illustrative assumptions until you start a private plan.</p>
+      <div class="section-heading"><div><span class="eyebrow">Four parallel routes</span><h2 id="paths-title">Compare the paths.<br><em>Choose together.</em></h2></div><p>No automatic winner. The $700k planning target, lender-style DTI guides, comfort ceiling, cash-to-close, sale proceeds, debt payoff, and reserve each answer a different question.</p></div>
+
+      <div class="affordability-band" aria-labelledby="affordability-title">
+        <div><span class="card-kicker" id="affordability-title">Affordability guardrails</span><p>Guide rails, not lender approval. Monthly housing includes the model’s principal, tax, insurance, HOA, PMI, maintenance, and other housing assumptions.</p></div>
+        <dl><div><dt>Gross monthly</dt><dd id="gross-monthly" data-sensitive-output>—</dd></div><div><dt>DTI housing ceiling</dt><dd id="dti-ceiling" data-sensitive-output>—</dd></div><div><dt>Comfort ceiling</dt><dd id="comfort-ceiling" data-sensitive-output>—</dd></div><div><dt>Planning ceiling</dt><dd id="planning-ceiling" data-sensitive-output>—</dd></div></dl>
+        <p id="affordability-missing" class="missing">Calculating…</p>
       </div>
+
       <div class="scenario-grid" id="scenario-grid">
-        <article class="scenario-card" data-scenario-card="land-build">
-          <div class="scenario-top"><span>01</span><button type="button" class="focus-button" data-focus="land-build" aria-pressed="false">Set as focus</button></div>
-          <h3>Land + build</h3><p>A two-stage path with the widest timing and feasibility range.</p>
-<dl class="metrics"><div><dt>Entry cash</dt><dd data-output="landBuild.entryCash">—</dd></div><div><dt>Total move cash</dt><dd data-output="landBuild.committedCash">—</dd></div><div><dt>Available funds</dt><dd data-output="landBuild.availableFunds">—</dd></div><div><dt>Cash after move</dt><dd data-output="landBuild.postMoveCash">—</dd></div><div><dt>Monthly housing</dt><dd data-output="landBuild.monthly">—</dd></div><div><dt>Reserve position</dt><dd data-output="landBuild.cushion">—</dd></div><div><dt>Monthly cash flow</dt><dd data-output="landBuild.cashFlow">—</dd></div><div><dt>Reserve runway</dt><dd data-output="landBuild.runway">—</dd></div></dl>
-          <p class="missing" data-missing="landBuild">Calculating…</p>
-          <p class="tradeoff">Highest diligence load: access, utilities, site work, permits, carry, and fallback housing.</p>
-        </article>
-        <article class="scenario-card" data-scenario-card="ready-home">
-          <div class="scenario-top"><span>02</span><button type="button" class="focus-button" data-focus="ready-home" aria-pressed="false">Set as focus</button></div>
-          <h3>Move-in-ready</h3><p>Direct ownership when job, sale, financing, and closing dates align.</p>
-<dl class="metrics"><div><dt>Cash to close</dt><dd data-output="readyHome.entryCash">—</dd></div><div><dt>Total move cash</dt><dd data-output="readyHome.committedCash">—</dd></div><div><dt>Available funds</dt><dd data-output="readyHome.availableFunds">—</dd></div><div><dt>Cash after move</dt><dd data-output="readyHome.postMoveCash">—</dd></div><div><dt>Monthly housing</dt><dd data-output="readyHome.monthly">—</dd></div><div><dt>Reserve position</dt><dd data-output="readyHome.cushion">—</dd></div><div><dt>Monthly cash flow</dt><dd data-output="readyHome.cashFlow">—</dd></div><div><dt>Reserve runway</dt><dd data-output="readyHome.runway">—</dd></div></dl>
-          <p class="missing" data-missing="readyHome">Calculating…</p>
-          <p class="tradeoff">Lower project complexity, but property-specific tax, insurance, inspection, and commute still control.</p>
-        </article>
-        <article class="scenario-card" data-scenario-card="fixer">
-          <div class="scenario-top"><span>03</span><button type="button" class="focus-button" data-focus="fixer" aria-pressed="false">Set as focus</button></div>
-          <h3>Fixer</h3><p>Ownership plus a defined, inspected improvement program.</p>
-<dl class="metrics"><div><dt>Cash before occupancy</dt><dd data-output="fixer.entryCash">—</dd></div><div><dt>Total move cash</dt><dd data-output="fixer.committedCash">—</dd></div><div><dt>Available funds</dt><dd data-output="fixer.availableFunds">—</dd></div><div><dt>Cash after move</dt><dd data-output="fixer.postMoveCash">—</dd></div><div><dt>Monthly housing</dt><dd data-output="fixer.monthly">—</dd></div><div><dt>Reserve position</dt><dd data-output="fixer.cushion">—</dd></div><div><dt>Monthly cash flow</dt><dd data-output="fixer.cashFlow">—</dd></div><div><dt>Reserve runway</dt><dd data-output="fixer.runway">—</dd></div></dl>
-          <p class="missing" data-missing="fixer">Calculating…</p>
-          <p class="tradeoff">Works only if safely habitable and verified repairs, contingency, financing, and overlap fit the cap.</p>
-        </article>
-        <article class="scenario-card" data-scenario-card="rent-first">
-          <div class="scenario-top"><span>04</span><button type="button" class="focus-button" data-focus="rent-first" aria-pressed="false">Set as focus</button></div>
-          <h3>Rent first</h3><p>A schedule-flexible bridge while worksite or ownership readiness settles.</p>
-<dl class="metrics"><div><dt>Move-in cash</dt><dd data-output="rentFirst.entryCash">—</dd></div><div><dt>Total move cash</dt><dd data-output="rentFirst.committedCash">—</dd></div><div><dt>Available funds</dt><dd data-output="rentFirst.availableFunds">—</dd></div><div><dt>Cash after move</dt><dd data-output="rentFirst.postMoveCash">—</dd></div><div><dt>Monthly housing</dt><dd data-output="rentFirst.monthly">—</dd></div><div><dt>Reserve position</dt><dd data-output="rentFirst.cushion">—</dd></div><div><dt>Monthly cash flow</dt><dd data-output="rentFirst.cashFlow">—</dd></div><div><dt>Reserve runway</dt><dd data-output="rentFirst.runway">—</dd></div></dl>
-          <p class="missing" data-missing="rentFirst">Calculating…</p>
-          <p class="tradeoff">Preserves optionality, with pet constraints and the possible cost of moving twice.</p>
-        </article>
+        <article class="scenario-card" data-scenario-card="land-build"><div class="scenario-top"><span>01</span><button type="button" class="focus-button" data-focus="land-build" aria-pressed="false">Set as focus</button></div><h3>Land + build</h3><p>A two-stage path with the widest timing and feasibility range.</p><dl class="metrics"><div><dt>Entry cash</dt><dd data-output="landBuild.entryCash">—</dd></div><div><dt>Cash after move</dt><dd data-output="landBuild.postMoveCash">—</dd></div><div><dt>Monthly housing</dt><dd data-output="landBuild.monthly">—</dd></div><div><dt>Monthly ceiling headroom</dt><dd data-output="landBuild.monthlyHeadroom">—</dd></div><div><dt>Planning-target headroom</dt><dd data-output="landBuild.priceHeadroom">—</dd></div><div><dt>Reserve position</dt><dd data-output="landBuild.cushion">—</dd></div><div><dt>Total DTI guide</dt><dd data-output="landBuild.totalDti">—</dd></div><div><dt>Monthly cash flow</dt><dd data-output="landBuild.cashFlow">—</dd></div></dl><p class="missing" data-missing="landBuild">Calculating…</p><p class="tradeoff">Utilities, access, site work, permits, construction carry, hazards, and fallback housing all need written evidence.</p></article>
+        <article class="scenario-card" data-scenario-card="ready-home"><div class="scenario-top"><span>02</span><button type="button" class="focus-button" data-focus="ready-home" aria-pressed="false">Set as focus</button></div><h3>Move-in-ready</h3><p>Direct ownership when job, sale, financing, and closing dates align.</p><dl class="metrics"><div><dt>Cash to close</dt><dd data-output="readyHome.entryCash">—</dd></div><div><dt>Cash after move</dt><dd data-output="readyHome.postMoveCash">—</dd></div><div><dt>Monthly housing</dt><dd data-output="readyHome.monthly">—</dd></div><div><dt>Monthly ceiling headroom</dt><dd data-output="readyHome.monthlyHeadroom">—</dd></div><div><dt>Planning-target headroom</dt><dd data-output="readyHome.priceHeadroom">—</dd></div><div><dt>Reserve position</dt><dd data-output="readyHome.cushion">—</dd></div><div><dt>Total DTI guide</dt><dd data-output="readyHome.totalDti">—</dd></div><div><dt>Monthly cash flow</dt><dd data-output="readyHome.cashFlow">—</dd></div></dl><p class="missing" data-missing="readyHome">Calculating…</p><p class="tradeoff">Lower project complexity; property tax, insurance, inspection, school assignment, and commute still control.</p></article>
+        <article class="scenario-card" data-scenario-card="fixer"><div class="scenario-top"><span>03</span><button type="button" class="focus-button" data-focus="fixer" aria-pressed="false">Set as focus</button></div><h3>Fixer</h3><p>Ownership plus a defined, inspected improvement program.</p><dl class="metrics"><div><dt>Cash before occupancy</dt><dd data-output="fixer.entryCash">—</dd></div><div><dt>Cash after move</dt><dd data-output="fixer.postMoveCash">—</dd></div><div><dt>Monthly housing</dt><dd data-output="fixer.monthly">—</dd></div><div><dt>Monthly ceiling headroom</dt><dd data-output="fixer.monthlyHeadroom">—</dd></div><div><dt>All-in target headroom</dt><dd data-output="fixer.priceHeadroom">—</dd></div><div><dt>Reserve position</dt><dd data-output="fixer.cushion">—</dd></div><div><dt>Total DTI guide</dt><dd data-output="fixer.totalDti">—</dd></div><div><dt>Monthly cash flow</dt><dd data-output="fixer.cashFlow">—</dd></div></dl><p class="missing" data-missing="fixer">Calculating…</p><p class="tradeoff">Works only if safely habitable and verified repairs, contingency, financing, and overlap fit the cap.</p></article>
+        <article class="scenario-card" data-scenario-card="rent-first"><div class="scenario-top"><span>04</span><button type="button" class="focus-button" data-focus="rent-first" aria-pressed="false">Set as focus</button></div><h3>Rent first</h3><p>A schedule-flexible bridge while worksite or ownership readiness settles.</p><dl class="metrics"><div><dt>Move-in cash</dt><dd data-output="rentFirst.entryCash">—</dd></div><div><dt>Cash after move</dt><dd data-output="rentFirst.postMoveCash">—</dd></div><div><dt>Monthly housing</dt><dd data-output="rentFirst.monthly">—</dd></div><div><dt>Monthly ceiling headroom</dt><dd data-output="rentFirst.monthlyHeadroom">—</dd></div><div><dt>Available move funds</dt><dd data-output="rentFirst.availableFunds">—</dd></div><div><dt>Reserve position</dt><dd data-output="rentFirst.cushion">—</dd></div><div><dt>Total DTI guide</dt><dd data-output="rentFirst.totalDti">—</dd></div><div><dt>Monthly cash flow</dt><dd data-output="rentFirst.cashFlow">—</dd></div></dl><p class="missing" data-missing="rentFirst">Calculating…</p><p class="tradeoff">Preserves optionality, with dog constraints and the possible cost of moving twice.</p></article>
       </div>
-      <p class="assumption-note" id="assumption-note"><strong>Example assumptions:</strong> 6.66% mortgage rate, 20% down, and clearly illustrative tax, insurance, maintenance, income, cash, and current-home values. These are not quotes, a 2027 forecast, or this household’s private financials.</p>
+      <p class="assumption-note" id="assumption-note"><strong>Illustrative only:</strong> the example is fictional and rounded. It is not this household’s private financial truth, a quote, a 2027 forecast, or lender approval.</p>
 
       <div class="assumption-stack" id="assumptions">
-        <details open><summary><span>Shared finance assumptions</span><small>Funds, income, reserve, move</small></summary><div class="input-grid" data-form="shared"></div></details>
-        <details><summary><span>Land + build assumptions</span><small>Simplified construction-to-permanent model</small></summary><div class="input-grid" data-form="landBuild"></div><p class="form-note">Lender eligibility, draws, construction interest, permits, utilities, and site work vary. Put construction-period carry in the transition fields.</p></details>
-        <details><summary><span>Move-in-ready assumptions</span><small>Purchase, close, monthly, transition</small></summary><div class="input-grid" data-form="readyHome"></div></details>
-        <details><summary><span>Fixer assumptions</span><small>Purchase, rehab, monthly, transition</small></summary><div class="input-grid" data-form="fixer"></div></details>
-        <details><summary><span>Rent-first assumptions</span><small>Move-in, rent, pets, transition</small></summary><div class="input-grid" data-form="rentFirst"></div></details>
+        <details open><summary><span>Income, debt + cash guardrails</span><small>DTI, comfort, payoff, reserve</small></summary><div class="input-grid" data-form="shared"></div><p class="form-note">Non-housing spending should include current debt payments. “Payments eliminated” is removed once after payoff so debt relief is not counted twice.</p></details>
+        <details><summary><span>Land + build assumptions</span><small>Construction-to-permanent orientation</small></summary><div class="input-grid" data-form="landBuild"></div><p class="form-note">Put construction-period carry in transition. Written zoning, access, utilities, hazard, design, permit, lender, builder and insurance evidence comes before a land commitment.</p></details>
+        <details><summary><span>Move-in-ready assumptions</span><small>Purchase, close, monthly, overlap</small></summary><div class="input-grid" data-form="readyHome"></div></details>
+        <details><summary><span>Fixer assumptions</span><small>Purchase, rehab, monthly, overlap</small></summary><div class="input-grid" data-form="fixer"></div></details>
+        <details><summary><span>Rent-first assumptions</span><small>Move-in, rent, dogs, transition</small></summary><div class="input-grid" data-form="rentFirst"></div></details>
       </div>
     </section>
 
     <section id="sale" class="section-shell split-section" aria-labelledby="sale-title">
-      <div>
-        <span class="eyebrow">Current-home exit</span>
-        <h2 id="sale-title">Know what the sale<br><em>really contributes.</em></h2>
-        <p>Use conservative, working, and stretch cases outside this simple reference case. Never clamp negative proceeds: if the sale needs cash, the plan should say so.</p>
-        <div class="sale-result"><span>Estimated net proceeds</span><strong id="sale-net">—</strong><small id="sale-detail">Sale price − payoff − selling costs − preparation − fixed seller costs</small></div>
-      </div>
-      <div>
-        <div class="input-grid compact" data-form="sale"></div>
-        <ol class="readiness-list">
-          <li><span>01</span><div><strong>Evidence</strong><p>Current payoff, basis and improvements, permits and claims.</p></div></li>
-          <li><span>02</span><div><strong>Market range</strong><p>Two valuation views and two seller net sheets—not a city median.</p></div></li>
-          <li><span>03</span><div><strong>Sequence</strong><p>Model sell-first, contingent purchase, rent-back, or temporary housing and maximum overlap.</p></div></li>
-        </ol>
-      </div>
+      <div><span class="eyebrow">Current-home exit</span><h2 id="sale-title">See the range.<br><em>Then allocate it.</em></h2><p>The conservative case pairs the low sale price with maximum preparation; the stretch case pairs the high price with minimum preparation. None of these is an appraisal.</p><div class="sale-range"><div><span>Conservative net</span><strong id="sale-low" data-sensitive-output>—</strong></div><div class="working"><span>Working net</span><strong id="sale-net" data-sensitive-output>—</strong></div><div><span>Stretch net</span><strong id="sale-high" data-sensitive-output>—</strong></div></div><p id="sale-detail" class="datum-note dark-note">Sale price − mortgage/lien payoffs − selling costs − preparation − fixed costs − concessions.</p><div class="sale-result"><span>Working funds after planned debt payoff</span><strong id="usable-funds" data-sensitive-output>—</strong><small>Working net sale + liquid funds + other move funds − planned debt payoff. Scenario move cash and reserve are still separate.</small></div></div>
+      <div><div class="input-grid compact" data-form="sale"></div><ol class="readiness-list"><li><span>01</span><div><strong>Evidence</strong><p>Current payoff, permits, basis/improvements, claims, and repair scope.</p></div></li><li><span>02</span><div><strong>Market range</strong><p>County facts, two automated views, a local CMA, and two seller net sheets.</p></div></li><li><span>03</span><div><strong>Sequence</strong><p>Compare sell-first, contingent purchase, rent-back, or temporary housing and maximum overlap.</p></div></li></ol></div>
     </section>
 
     <section id="places" class="place-section" aria-labelledby="places-title">
       <div class="section-shell">
-        <div class="section-heading light"><div><span class="eyebrow">Place + career geography</span><h2 id="places-title">Two bases.<br><em>One actual commute test.</em></h2></div><p>Neither city is ranked. Test three plausible home addresses to the actual worksite, at the actual shift time, before choosing.</p></div>
-        <div class="place-grid">
-          <article><div class="map-label">45.5229° N / 122.9898° W</div><h3>Hillsboro</h3><p class="place-lead">Best-supported geography for Intel and the dense west-side semiconductor ecosystem.</p><ul><li>July 2026 all-home median: <strong>$529,235</strong></li><li>Aug 2026 asking-rent orientation: <strong>$2,500 3BR / $3,106 4BR</strong></li><li>MAX Blue and Red context; verify exact campus and shift.</li></ul><p class="datum-note">Citywide orientation only. Not a family-home budget, appraisal, tax estimate, or availability claim.</p></article>
-          <article><div class="map-label">45.4312° N / 122.7715° W</div><h3>Tigard</h3><p class="place-lead">Meaningful when the worksite is in Tualatin, including Lam Research facilities.</p><ul><li>July 2026 all-home median: <strong>$599,675</strong></li><li>Aug 2026 asking-rent orientation: <strong>$2,595 3BR / $3,700 4BR</strong></li><li>WES is weekday rush-hour service; test Intel commutes directly.</li></ul><p class="datum-note">School assignment is address-specific; a Tigard mailing address does not prove district assignment.</p></article>
+        <div class="section-heading light"><div><span class="eyebrow">Area explorer</span><h2 id="places-title">Jobs, schools, water.<br><em>One honest map.</em></h2></div><p>This is a schematic orientation map—not navigation, commute proof, school assignment, flood mapping, or a property boundary. Select a job lens, then open live listing and official lookup links.</p></div>
+        <div class="map-toolbar">
+          <label for="commute-target">Commute lens <select id="commute-target"><option value="intel">Intel · Hillsboro</option><option value="nike">Nike · Beaverton</option><option value="lam">Lam · Tualatin</option><option value="portland">Portland professional services</option></select></label>
+          <fieldset><legend>Map layers</legend><label><input type="checkbox" data-map-layer="jobs" checked> Jobs</label><label><input type="checkbox" data-map-layer="schools" checked> Districts</label><label><input type="checkbox" data-map-layer="water" checked> Water</label><label><input type="checkbox" data-map-layer="candidates" checked> My candidates</label></fieldset>
         </div>
-        <div class="career-gate">
-          <div><span class="eyebrow">The employment gate</span><h3>Job first. Property second.</h3></div>
-          <p>The strongest bridge is senior technical program, engineering operations, systems architecture, or AI product/solutions work. Intel is a documented Hillsboro anchor; Lam supports the Tigard–Tualatin geography. NVIDIA is a role-by-role lead only. A written offer or durable remote arrangement—not an assumed opening—unlocks a binding housing commitment.</p>
+        <div class="map-layout">
+          <div class="map-frame"><svg id="region-map" viewBox="0 0 500 520" role="img" aria-labelledby="map-title map-desc"><title id="map-title">Schematic west and southwest Portland move map</title><desc id="map-desc">Selectable area markers, verified employment anchors, district context, waterways, and approximate private candidate pins. A text area list follows.</desc><rect class="map-land" x="1" y="1" width="498" height="518" rx="18"></rect><g id="water-layer"></g><g id="school-layer"></g><g id="job-layer"></g><g id="area-layer"></g><g id="candidate-layer"></g></svg><p class="map-key"><span class="key-area">● area</span><span class="key-job">◆ job</span><span class="key-school">■ district</span><span class="key-candidate">★ saved candidate</span></p></div>
+          <aside id="area-detail" class="area-detail" aria-live="polite"><span class="card-kicker">Select an area</span><h3>Hillsboro / Orenco</h3><p>Use the map or area list to compare fit.</p></aside>
         </div>
+        <div id="area-list" class="area-list"></div>
+
+        <div class="candidate-board">
+          <div><span class="eyebrow">Local candidate notebook</span><h3>Save the contenders,<br><em>not street addresses.</em></h3><p>Use a neutral nickname and paste a listing link if useful. Nothing is fetched or uploaded. The link reveals its destination only when you choose to open it.</p></div>
+          <form id="candidate-form">
+            <label>Nickname<input id="candidate-label" maxlength="120" required placeholder="House A or Newberg land"></label>
+            <label>Area<select id="candidate-area" required></select></label>
+            <label>Path<select id="candidate-path"><option value="ready-home">Move-in-ready</option><option value="fixer">Fixer</option><option value="land-build">Land + build</option><option value="rent-first">Rental</option></select></label>
+            <label>Status<select id="candidate-status"><option value="watch">Watch</option><option value="visit">Plan a visit</option><option value="shortlist">Shortlist</option><option value="pass">Pass</option></select></label>
+            <label>Price estimate<input id="candidate-price" type="number" min="0" max="100000000" step="1000" inputmode="numeric" placeholder="Optional"></label>
+            <label class="wide">Listing or parcel URL<input id="candidate-url" type="url" maxlength="2048" placeholder="https://…"></label>
+            <label class="wide">Notes<textarea id="candidate-notes" maxlength="1000" rows="3" placeholder="Commute to verify, school lookup, dog yard, water or hazard questions…"></textarea></label>
+            <button id="candidate-add" class="button primary" type="submit" disabled>Add to this model</button>
+          </form>
+        </div>
+        <div id="candidate-list" class="candidate-list"></div>
+
+        <div class="career-gate"><div><span class="eyebrow">Employment gate</span><h3>Jobsite first. Property second.</h3></div><p>Intel is the strongest documented Hillsboro anchor; Nike supports Beaverton; Lam supports Tualatin and the southern corridor; Deloitte has a Northwest Portland office. Microsoft is remote/transfer-to-confirm, and NVIDIA is a role-by-role signal. A written offer or durable remote arrangement—not an assumed opening—unlocks a binding housing commitment.</p></div>
       </div>
     </section>
 
     <section id="roadmap" class="section-shell roadmap-section" aria-labelledby="roadmap-title">
-      <div class="section-heading"><div><span class="eyebrow">Twelve-month field plan</span><h2 id="roadmap-title">From truth set<br><em>to school-ready.</em></h2></div><div><p>Target-date changes recalculate offset tasks; fixed calendar gates keep their override. In a private plan, change owner and status with standard keyboard controls.</p><button id="reset-roadmap" class="button secondary" type="button" disabled>Reset roadmap</button></div></div>
-      <div id="roadmap-list" class="roadmap-list"></div>
+      <div class="section-heading"><div><span class="eyebrow">Editable 12-month Gantt</span><h2 id="roadmap-title">From truth set<br><em>to school-ready.</em></h2></div><div><p>Change due date, duration, owner, and status in either private model. A changed due date becomes fixed; “Follow target” restores its offset from the milestone.</p><button id="reset-roadmap" class="button secondary" type="button" disabled>Reset this roadmap</button></div></div>
+      <div class="gantt-scroll" aria-label="Roadmap timeline; scroll horizontally to inspect all months">
+        <div class="gantt-axis" id="gantt-axis" aria-hidden="true"></div>
+        <div id="roadmap-list" class="roadmap-list"></div>
+      </div>
     </section>
 
     <section id="sources" class="section-shell sources-section" aria-labelledby="sources-title">
-      <div class="section-heading"><div><span class="eyebrow">Evidence, not certainty</span><h2 id="sources-title">Dated inputs.<br><em>Visible limits.</em></h2></div><p>Market data, rates, job locations, taxes, permits, schools, insurance, and transit change. Refresh current claims before decisions and replace city averages with address-specific written evidence.</p></div>
+      <div class="section-heading"><div><span class="eyebrow">Evidence, not certainty</span><h2 id="sources-title">Dated inputs.<br><em>Visible limits.</em></h2></div><p>Listings, valuations, rates, jobs, school boundaries, calendars, taxes, permits, hazards, and drive times change. Refresh before decisions and replace area averages with address- and parcel-specific written evidence.</p></div>
       <div id="source-list" class="source-list"></div>
-      <div class="limits"><strong>This is a decision aid.</strong> It is not lender approval, an appraisal, inspection, title report, tax opinion, financial plan, legal advice, or a promise of employment.</div>
+      <div class="limits"><strong>This is a decision aid.</strong> It is not lender approval, an appraisal, inspection, survey, title report, tax opinion, financial plan, legal advice, school guarantee, commute guarantee, or promise of employment.</div>
     </section>
 
-    <noscript>
-      <section class="section-shell noscript-box" aria-labelledby="nojs-title">
-        <h2 id="nojs-title">The public plan still works without JavaScript.</h2>
-        <p>Compare land/build, move-in-ready, fixer, and rent-first against employment certainty, cash required, monthly affordability, timing, and family fit. Calculations, private save/import/export, and task editing require JavaScript. No private values are stored by this page.</p>
-      </section>
-    </noscript>
+    <noscript><section class="section-shell noscript-box"><h2>JavaScript is needed for the working board.</h2><p>The public source and decision framework remain readable, but calculations, the map, private models, candidate notebook, import/export, and Gantt editing require JavaScript. No private values are stored by this page without your choice.</p></section></noscript>
   </main>
 
-  <footer>
-    <div class="section-shell footer-grid">
-      <div><span class="mark" aria-hidden="true">OR</span><p>Plan the move. Protect the family’s optionality.</p></div>
-      <div><p>Public planner · private values stay local by choice.</p><a href="https://github.com/Sankofa06/the-Oregon-move" rel="noopener noreferrer">View source on GitHub <span aria-hidden="true">↗</span></a></div>
-    </div>
-  </footer>
-
-  <div class="print-private-warning">PRIVATE PLAN — contains locally entered financial estimates. Handle the printed copy securely.</div>
+  <footer><div class="section-shell footer-grid"><div><span class="mark" aria-hidden="true">OR</span><p>Plan the move. Protect the family’s optionality.</p></div><div><p>Public site · two local private models by choice.</p><a href="https://github.com/Sankofa06/the-Oregon-move" rel="noopener noreferrer">View source on GitHub <span aria-hidden="true">↗</span></a></div></div></footer>
+  <div class="print-private-warning">PRIVATE MODEL — contains locally entered financial estimates and candidate notes. Handle the printed copy securely.</div>
   <script type="module" src="./app.mjs"></script>
 </body>
 </html>

@@ -1,134 +1,113 @@
 export const PUBLIC_AS_OF = "2026-09-02";
 
-const ownershipMonthly = (basis, insurance) => ({
-  interestRateAnnual: 0.0666,
-  termYears: 30,
-  propertyTaxBasisUsd: basis,
-  propertyTaxRateAnnual: 0.01,
-  insuranceAnnualUsd: insurance,
-  hoaMonthlyUsd: 0,
-  pmiMonthlyUsd: 0,
-  maintenanceRateAnnual: 0.01,
-  otherMonthlyUsd: 0,
-});
+const blankMonthly = () => ({ interestRateAnnual: null, termYears: null, propertyTaxBasisUsd: null, propertyTaxRateAnnual: null, insuranceAnnualUsd: null, hoaMonthlyUsd: null, pmiMonthlyUsd: null, maintenanceRateAnnual: null, otherMonthlyUsd: null });
+const ownershipMonthly = (basis, insurance) => ({ interestRateAnnual: 0.0666, termYears: 30, propertyTaxBasisUsd: basis, propertyTaxRateAnnual: 0.01, insuranceAnnualUsd: insurance, hoaMonthlyUsd: 0, pmiMonthlyUsd: 0, maintenanceRateAnnual: 0.01, otherMonthlyUsd: 0 });
+const blankTransition = () => ({ oneTimeSetupUsd: null, transitionMonthlyUsd: null, transitionMonths: null });
 
-export const exampleEnvelope = {
-  schemaVersion: "1.0.0",
+const roadmapTemplate = [
+  { id: "baseline", phaseId: "foundation", title: "Reconcile income, cash, debts, essentials, credit status, and reserve floor", owner: "both", status: "in-progress", offsetMonths: -12, dueDateOverride: "2026-09-30", durationWeeks: 4, scenario: "all", notes: "Use current statements; keep private values out of Git." },
+  { id: "family-fit", phaseId: "foundation", title: "Write the family must-haves for schools, dogs, bedrooms, water, and commute", owner: "both", status: "not-started", offsetMonths: -11, dueDateOverride: "2026-10-15", durationWeeks: 4, scenario: "all", notes: "Use address-specific school and pet rules later." },
+  { id: "career-tracks", phaseId: "career", title: "Refresh two career tracks and begin weekly location-filtered role review", owner: "me", status: "not-started", offsetMonths: -11, dueDateOverride: "2026-10-31", durationWeeks: 8, scenario: "all", notes: "Verify jobsite and work model for every role; do not assume an opening or transfer." },
+  { id: "sale-evidence", phaseId: "sale", title: "Gather payoff, repair scope, two valuation views, and two seller net sheets", owner: "both", status: "not-started", offsetMonths: -9, dueDateOverride: null, durationWeeks: 8, scenario: "all", notes: "Replace automated values with a local CMA and written seller net sheets." },
+  { id: "scout", phaseId: "paths", title: "Build matched purchase and dog-compatible rental comparison sets", owner: "partner", status: "not-started", offsetMonths: -8, dueDateOverride: null, durationWeeks: 16, scenario: "all", notes: "Compare actual space, pet terms, school assignment, hazards, water access, and commute." },
+  { id: "land-gate", phaseId: "paths", title: "Run jurisdiction, access, utility, flood, wetland, septic, well, and insurance screens", owner: "me", status: "not-started", offsetMonths: -7, dueDateOverride: null, durationWeeks: 12, scenario: "land-build", notes: "No land commitment without written feasibility, budget contingency, and a rent-first fallback." },
+  { id: "career-gate", phaseId: "career", title: "Career Gate 1: offer, credible interview traction, or fallback income plan", owner: "both", status: "not-started", offsetMonths: -6, dueDateOverride: null, durationWeeks: 10, scenario: "all", notes: "Keep cash preserved and rent-first open if worksite evidence is weak." },
+  { id: "path-focus", phaseId: "decision", title: "Choose an area focus and primary plus backup housing path", owner: "both", status: "not-started", offsetMonths: -5, dueDateOverride: null, durationWeeks: 6, scenario: "all", notes: "A focus path is for exploration, not an automated recommendation." },
+  { id: "sale-gate", phaseId: "sale", title: "Pass the income, move, current-home exit, and bridge-financing gates", owner: "both", status: "not-started", offsetMonths: -3, dueDateOverride: null, durationWeeks: 6, scenario: "all", notes: "List only when the move and maximum overlap plan are financeable." },
+  { id: "housing", phaseId: "contract", title: "Complete property or lease diligence and secure Oregon housing", owner: "both", status: "not-started", offsetMonths: -2, dueDateOverride: "2027-07-31", durationWeeks: 10, scenario: "all", notes: "Confirm address-specific school, insurance, commute, pet terms, hazards, inspection, and written fees." },
+  { id: "move", phaseId: "move", title: "Physical move window", owner: "both", status: "not-started", offsetMonths: 0, dueDateOverride: "2027-08-27", durationWeeks: 1, scenario: "all", notes: "Plan for August 21–27 with backup lodging and storage." },
+  { id: "school-ready", phaseId: "settle", title: "School-ready before district classes begin", owner: "both", status: "not-started", offsetMonths: 0, dueDateOverride: "2027-08-30", durationWeeks: 1, scenario: "all", notes: "Both current district calendars start many K–12 grades on Aug 31, 2027. TTSD lists Pre-K/K for Sep 8; preschool placement and program dates remain program-specific." },
+];
+
+export const blankPrivateEnvelope = {
+  schemaVersion: "2.0.0",
   revision: 0,
   updatedAt: "2026-09-02T12:00:00.000Z",
   mode: "private",
   plan: {
     targetMoveDate: "2027-09-01",
     destinationFocus: "both",
-    household: { adults: 2, children: 2, dogs: 2 },
-    career: {
-      status: "researching",
-      targetRoles: ["Senior technical program", "Engineering operations", "AI product or solutions"],
-      householdNetIncomeMonthlyUsd: 12_000,
-      nonHousingSpendMonthlyUsd: 7_000,
-    },
-    funds: { liquidUsd: 125_000, otherMoveFundsUsd: 25_000, reserveFloorUsd: 40_000 },
-    currentHomeSale: {
-      estimatedSalePriceUsd: 600_000,
-      mortgagePayoffUsd: 350_000,
-      sellingCostRate: 0.07,
-      prepAndRepairUsd: 12_000,
-      sellerFixedClosingUsd: 3_000,
-      expectedListDate: "2027-05-15",
-      expectedCloseDate: "2027-07-30",
-    },
-    commonMove: { movingAndTravelUsd: 18_000 },
+    household: { adults: null, children: null, dogs: null },
+    career: { status: "researching", targetRoles: [], primaryGrossAnnualUsd: null, partnerGrossAnnualUsd: null, householdNetIncomeMonthlyUsd: null, nonHousingSpendMonthlyUsd: null },
+    funds: { liquidUsd: null, otherMoveFundsUsd: null, reserveFloorUsd: null },
+    debtPlan: { plannedPaydownFromMoveFundsUsd: null, currentRequiredPaymentsMonthlyUsd: null, paymentsEliminatedMonthlyUsd: null },
+    affordability: { frontEndRate: null, backEndRate: null, comfortHousingMonthlyUsd: null, maxPurchaseTargetUsd: null },
+    currentHomeSale: { salePriceLowUsd: null, salePriceWorkingUsd: null, salePriceHighUsd: null, mortgagePayoffUsd: null, otherLienPayoffUsd: null, sellingCostRate: null, prepMinUsd: null, prepWorkingUsd: null, prepMaxUsd: null, sellerFixedClosingUsd: null, sellerConcessionsUsd: null, expectedListDate: "2027-05-15", expectedCloseDate: "2027-07-30" },
+    commonMove: { movingAndTravelUsd: null },
     scenarios: {
-      landBuild: {
-        enabled: true,
-        landPriceUsd: 200_000,
-        buildBaseUsd: 400_000,
-        siteWorkUsd: 80_000,
-        designPermitDueDiligenceCashOnlyUsd: 40_000,
-        buildAndSiteContingencyRate: 0.15,
-        downPaymentRate: 0.2,
-        loanClosingRate: 0.02,
-        prepaidsUsd: 3_000,
-        estimatedFinishedValueUsd: 760_000,
-        monthly: ownershipMonthly(752_000, 2_400),
-        transition: { oneTimeSetupUsd: 5_000, transitionMonthlyUsd: 3_100, transitionMonths: 12 },
-      },
-      readyHome: {
-        enabled: true,
-        purchasePriceUsd: 529_000,
-        downPaymentRate: 0.2,
-        buyerClosingRate: 0.03,
-        prepaidsUsd: 3_000,
-        monthly: ownershipMonthly(529_000, 1_800),
-        transition: { oneTimeSetupUsd: 2_000, transitionMonthlyUsd: 3_500, transitionMonths: 1 },
-      },
-      fixer: {
-        enabled: true,
-        purchasePriceUsd: 430_000,
-        downPaymentRate: 0.2,
-        buyerClosingRate: 0.03,
-        prepaidsUsd: 3_000,
-        rehabBaseUsd: 90_000,
-        rehabContingencyRate: 0.15,
-        rehabFinancedUsd: 50_000,
-        estimatedPostRehabValueUsd: 560_000,
-        monthly: ownershipMonthly(560_000, 1_900),
-        transition: { oneTimeSetupUsd: 3_000, transitionMonthlyUsd: 3_100, transitionMonths: 4 },
-      },
-      rentFirst: {
-        enabled: true,
-        rentMonthlyUsd: 3_100,
-        securityDepositUsd: 3_100,
-        firstMonthUsd: 3_100,
-        lastMonthUsd: 0,
-        petDepositUsd: 800,
-        applicationAndMoveInFeesUsd: 400,
-        rentersInsuranceMonthlyUsd: 30,
-        petRentMonthlyUsd: 100,
-        parkingAndOtherMonthlyUsd: 100,
-        transition: { oneTimeSetupUsd: 1_500, transitionMonthlyUsd: 0, transitionMonths: 0 },
-      },
+      landBuild: { enabled: true, landPriceUsd: null, buildBaseUsd: null, siteWorkUsd: null, designPermitDueDiligenceCashOnlyUsd: null, buildAndSiteContingencyRate: null, downPaymentRate: null, loanClosingRate: null, prepaidsUsd: null, estimatedFinishedValueUsd: null, monthly: blankMonthly(), transition: blankTransition() },
+      readyHome: { enabled: true, purchasePriceUsd: null, downPaymentRate: null, buyerClosingRate: null, prepaidsUsd: null, monthly: blankMonthly(), transition: blankTransition() },
+      fixer: { enabled: true, purchasePriceUsd: null, downPaymentRate: null, buyerClosingRate: null, prepaidsUsd: null, rehabBaseUsd: null, rehabContingencyRate: null, rehabFinancedUsd: null, estimatedPostRehabValueUsd: null, monthly: blankMonthly(), transition: blankTransition() },
+      rentFirst: { enabled: true, rentMonthlyUsd: null, securityDepositUsd: null, firstMonthUsd: null, lastMonthUsd: null, petDepositUsd: null, applicationAndMoveInFeesUsd: null, rentersInsuranceMonthlyUsd: null, petRentMonthlyUsd: null, parkingAndOtherMonthlyUsd: null, transition: blankTransition() },
     },
     selectedFocus: null,
-    roadmap: [
-      { id: "baseline", phaseId: "foundation", title: "Reconcile income, cash, debts, essentials, credit status, and reserve floor", owner: "both", status: "in-progress", offsetMonths: -12, dueDateOverride: "2026-09-30", scenario: "all", notes: "Use current statements; keep private values out of Git." },
-      { id: "family-fit", phaseId: "foundation", title: "Write the family must-haves for schools, dogs, bedrooms, and commute", owner: "both", status: "not-started", offsetMonths: -11, dueDateOverride: "2026-10-15", scenario: "all", notes: "Use address-specific school and pet rules later." },
-      { id: "career-tracks", phaseId: "career", title: "Refresh three career tracks and begin weekly role review", owner: "me", status: "not-started", offsetMonths: -11, dueDateOverride: "2026-10-31", scenario: "all", notes: "Intel, NVIDIA, Lam, ASML, Tokyo Electron, Applied Materials, and relevant remote employers." },
-      { id: "sale-evidence", phaseId: "sale", title: "Gather payoff, repair scope, two valuation views, and two seller net sheets", owner: "both", status: "not-started", offsetMonths: -9, dueDateOverride: null, scenario: "all", notes: "Do not treat a city median as a home appraisal." },
-      { id: "scout", phaseId: "paths", title: "Build matched purchase and dog-compatible rental comparison sets", owner: "partner", status: "not-started", offsetMonths: -8, dueDateOverride: null, scenario: "all", notes: "Compare actual bedroom count, pet terms, school assignment, and commute." },
-      { id: "land-gate", phaseId: "paths", title: "Run jurisdiction, access, utility, flood, wetland, septic, and insurance screens", owner: "me", status: "not-started", offsetMonths: -7, dueDateOverride: null, scenario: "land-build", notes: "No land commitment without written feasibility and a rent-first fallback." },
-      { id: "career-gate", phaseId: "career", title: "Career Gate 1: offer, credible interview traction, or fallback income plan", owner: "both", status: "not-started", offsetMonths: -6, dueDateOverride: null, scenario: "all", notes: "Keep cash preserved and rent-first open if evidence is weak." },
-      { id: "path-focus", phaseId: "decision", title: "Choose a town focus and primary plus backup housing path", owner: "both", status: "not-started", offsetMonths: -5, dueDateOverride: null, scenario: "all", notes: "A focus path is for exploration, not an automated recommendation." },
-      { id: "sale-gate", phaseId: "sale", title: "Pass the income, move, current-home exit, and bridge-financing gates", owner: "both", status: "not-started", offsetMonths: -3, dueDateOverride: null, scenario: "all", notes: "List only when the move and overlap plan are financeable." },
-      { id: "housing", phaseId: "contract", title: "Complete property or lease diligence and secure Oregon housing", owner: "both", status: "not-started", offsetMonths: -2, dueDateOverride: "2027-07-31", scenario: "all", notes: "Confirm address-specific school, insurance, commute, pet terms, and written fees." },
-      { id: "move", phaseId: "move", title: "Physical move window", owner: "both", status: "not-started", offsetMonths: 0, dueDateOverride: "2027-08-21", scenario: "all", notes: "Plan for August 21–27 with backup lodging and storage." },
-      { id: "school-ready", phaseId: "settle", title: "Family settled and school-ready milestone", owner: "both", status: "not-started", offsetMonths: 0, dueDateOverride: "2027-09-01", scenario: "all", notes: "This is not the moving-truck date; verify enrollment by actual address." },
-    ],
+    roadmap: structuredClone(roadmapTemplate),
+    candidates: [],
     preferences: { saveOnDevice: false, hideValues: false },
   },
 };
 
-export const paths = [
-  { key: "landBuild", slug: "land-build", number: "01", title: "Land + build", short: "A two-stage path with the widest timing and feasibility range.", tradeoff: "Highest diligence load: access, utilities, site work, permits, carry, and fallback housing." },
-  { key: "readyHome", slug: "ready-home", number: "02", title: "Move-in-ready", short: "Direct ownership when job, sale, financing, and closing dates align.", tradeoff: "Lower project complexity, but property-specific tax, insurance, inspection, and commute still control." },
-  { key: "fixer", slug: "fixer", number: "03", title: "Fixer", short: "Ownership plus a defined, inspected improvement program.", tradeoff: "Works only if safely habitable and verified repairs, contingency, financing, and overlap fit the cap." },
-  { key: "rentFirst", slug: "rent-first", number: "04", title: "Rent first", short: "A schedule-flexible bridge while worksite or ownership readiness settles.", tradeoff: "Preserves optionality, with pet constraints and the possible cost of moving twice." },
+export const exampleEnvelope = structuredClone(blankPrivateEnvelope);
+exampleEnvelope.plan.household = { adults: 2, children: 2, dogs: 1 };
+Object.assign(exampleEnvelope.plan.career, { targetRoles: ["Senior technical program", "Engineering operations", "AI product or solutions"], primaryGrossAnnualUsd: 120_000, partnerGrossAnnualUsd: 120_000, householdNetIncomeMonthlyUsd: 12_000, nonHousingSpendMonthlyUsd: 7_000 });
+Object.assign(exampleEnvelope.plan.funds, { liquidUsd: 125_000, otherMoveFundsUsd: 25_000, reserveFloorUsd: 40_000 });
+Object.assign(exampleEnvelope.plan.debtPlan, { plannedPaydownFromMoveFundsUsd: 50_000, currentRequiredPaymentsMonthlyUsd: 2_500, paymentsEliminatedMonthlyUsd: 500 });
+Object.assign(exampleEnvelope.plan.affordability, { frontEndRate: 0.28, backEndRate: 0.36, comfortHousingMonthlyUsd: 4_800, maxPurchaseTargetUsd: 700_000 });
+Object.assign(exampleEnvelope.plan.currentHomeSale, { salePriceLowUsd: 500_000, salePriceWorkingUsd: 550_000, salePriceHighUsd: 600_000, mortgagePayoffUsd: 300_000, otherLienPayoffUsd: 10_000, sellingCostRate: 0.06, prepMinUsd: 10_000, prepWorkingUsd: 20_000, prepMaxUsd: 30_000, sellerFixedClosingUsd: 5_000, sellerConcessionsUsd: 0 });
+exampleEnvelope.plan.commonMove.movingAndTravelUsd = 18_000;
+Object.assign(exampleEnvelope.plan.scenarios.landBuild, { landPriceUsd: 180_000, buildBaseUsd: 390_000, siteWorkUsd: 70_000, designPermitDueDiligenceCashOnlyUsd: 35_000, buildAndSiteContingencyRate: 0.15, downPaymentRate: 0.2, loanClosingRate: 0.02, prepaidsUsd: 3_000, estimatedFinishedValueUsd: 740_000, monthly: ownershipMonthly(709_000, 2_400), transition: { oneTimeSetupUsd: 5_000, transitionMonthlyUsd: 3_100, transitionMonths: 12 } });
+Object.assign(exampleEnvelope.plan.scenarios.readyHome, { purchasePriceUsd: 650_000, downPaymentRate: 0.15, buyerClosingRate: 0.03, prepaidsUsd: 4_000, monthly: ownershipMonthly(650_000, 2_100), transition: { oneTimeSetupUsd: 2_000, transitionMonthlyUsd: 3_500, transitionMonths: 1 } });
+Object.assign(exampleEnvelope.plan.scenarios.fixer, { purchasePriceUsd: 500_000, downPaymentRate: 0.15, buyerClosingRate: 0.03, prepaidsUsd: 4_000, rehabBaseUsd: 80_000, rehabContingencyRate: 0.15, rehabFinancedUsd: 40_000, estimatedPostRehabValueUsd: 640_000, monthly: ownershipMonthly(592_000, 2_000), transition: { oneTimeSetupUsd: 3_000, transitionMonthlyUsd: 3_100, transitionMonths: 4 } });
+Object.assign(exampleEnvelope.plan.scenarios.rentFirst, { rentMonthlyUsd: 3_200, securityDepositUsd: 3_200, firstMonthUsd: 3_200, lastMonthUsd: 0, petDepositUsd: 800, applicationAndMoveInFeesUsd: 400, rentersInsuranceMonthlyUsd: 30, petRentMonthlyUsd: 100, parkingAndOtherMonthlyUsd: 100, transition: { oneTimeSetupUsd: 1_500, transitionMonthlyUsd: 0, transitionMonths: 0 } });
+exampleEnvelope.plan.candidates = [{ id: "example-hillsboro-search", label: "Example: Hillsboro family-home search", areaKey: "hillsboro", housingPath: "ready-home", status: "watch", priceUsd: 650_000, url: "https://www.redfin.com/city/8712/OR/Hillsboro/homes-for-sale-under-700000", notes: "Illustrative notebook entry—not a specific property or recommendation." }];
+
+export const areaProfiles = [
+  { key: "hillsboro", name: "Hillsboro / Orenco", x: 155, y: 160, market: "About $529k citywide median · Jul 2026", summary: "Best Intel hedge; parks, wetlands, MAX, and meaningful family inventory under the working ceiling.", water: "Tualatin River access and wetlands; verify flood/wetland constraints.", school: "Hillsboro SD", schoolUrl: "https://www.hsd.k12.or.us/for-families/boundaries-and-transfers/attendance-boundaries", redfin: "https://www.redfin.com/city/8712/OR/Hillsboro/homes-for-sale-under-700000", zillow: "https://www.zillow.com/hillsboro-or/", fit: { intel: "strong", nike: "workable", lam: "variable", portland: "workable" } },
+  { key: "north-plains", name: "North Plains", x: 118, y: 102, market: "About $460k · Jun 2026; small sample", summary: "Rural-edge scenery and newer homes; strongest as an Intel-first choice.", water: "Creeks and rural land; verify wells, septic, flood and legal access.", school: "Hillsboro SD", schoolUrl: "https://www.hsd.k12.or.us/for-families/boundaries-and-transfers/attendance-boundaries", redfin: "https://www.redfin.com/city/13696/OR/North-Plains/homes-for-sale-under-700000", zillow: "https://www.zillow.com/north-plains-or/", fit: { intel: "strong", nike: "workable", lam: "stretched", portland: "variable" } },
+  { key: "forest-grove", name: "Forest Grove", x: 72, y: 220, market: "About $501k · Jul 2026", summary: "More space and Coast Range character; southern work trips can miss the one-hour goal.", water: "Hagg Lake nearby; not the same as waterfront inventory.", school: "Forest Grove SD", schoolUrl: "https://www.fgsdk12.org/apps/pages/index.jsp?pREC_ID=2167753&type=d&uREC_ID=1129381", redfin: "https://www.redfin.com/city/6710/OR/Forest-Grove/homes-for-sale-under-700000", zillow: "https://www.zillow.com/forest-grove-or/", fit: { intel: "workable", nike: "variable", lam: "stretched", portland: "stretched" } },
+  { key: "beaverton", name: "Beaverton", x: 270, y: 205, market: "About $573k · Jul 2026", summary: "Strong two-career compromise for Nike, Intel, and central Portland; less acreage.", water: "Tualatin Hills parks and streams; parcel hazards still apply.", school: "Beaverton SD", schoolUrl: "https://www.beaverton.k12.or.us/departments/long-range-facility-planning/boundary-information", redfin: "https://www.redfin.com/city/1432/OR/Beaverton/homes-for-sale-under-700000", zillow: "https://www.zillow.com/beaverton-or/", fit: { intel: "workable", nike: "strong", lam: "workable", portland: "strong" } },
+  { key: "cedar-mill", name: "Cedar Mill / Bethany", x: 275, y: 125, market: "Use matched Beaverton-area listings", summary: "Green west-side setting with access to Nike, Intel, and Portland; large homes may press the ceiling.", water: "Creek corridors and slopes require parcel-level review.", school: "Beaverton SD", schoolUrl: "https://www.beaverton.k12.or.us/departments/long-range-facility-planning/boundary-information", redfin: "https://www.redfin.com/city/1432/OR/Beaverton/homes-for-sale-under-700000", zillow: "https://www.zillow.com/cedar-mill-or/", fit: { intel: "workable", nike: "strong", lam: "variable", portland: "strong" } },
+  { key: "nob-hill", name: "Nob Hill / Northwest", x: 385, y: 178, market: "About $630k mixed property types · Jul 2026", summary: "The urban lifestyle reference you enjoyed; budget inventory skews condo or townhome rather than land and yard.", water: "Near the Willamette, but not a suburban waterfront search.", school: "Portland Public Schools", schoolUrl: "https://www.pps.net/about/searchable-directory/school-locator", redfin: "https://www.redfin.com/neighborhood/32432/OR/Portland/Northwest-District/homes-for-sale-under-700000", zillow: "https://www.zillow.com/portland-or/nob-hill_att/", fit: { intel: "variable", nike: "workable", lam: "variable", portland: "strong" } },
+  { key: "tigard", name: "Tigard / Bull Mountain", x: 292, y: 292, market: "About $600k · Jul 2026", summary: "Strong family-home compromise for Nike, Lam, and Portland; Intel is traffic-sensitive.", water: "Tualatin River trails and greenways; views and access vary.", school: "Tigard-Tualatin SD", schoolUrl: "https://www.ttsdschools.org/about-us/boundary-map-and-school-locator", redfin: "https://www.redfin.com/city/18733/OR/Tigard/homes-for-sale-under-700000", zillow: "https://www.zillow.com/tigard-or/", fit: { intel: "variable", nike: "strong", lam: "strong", portland: "workable" } },
+  { key: "tualatin", name: "Tualatin", x: 322, y: 355, market: "About $591k · Jul 2026", summary: "Best Lam anchor with river greenway; Intel may exceed the target in peak traffic.", water: "Tualatin River recreation; require flood and insurance checks.", school: "Tigard-Tualatin SD", schoolUrl: "https://www.ttsdschools.org/about-us/boundary-map-and-school-locator", redfin: "https://www.redfin.com/city/30775/OR/Tualatin/homes-for-sale-under-700000", zillow: "https://www.zillow.com/tualatin-or/", fit: { intel: "stretched", nike: "workable", lam: "strong", portland: "workable" } },
+  { key: "sherwood", name: "Sherwood", x: 235, y: 368, market: "About $662k · Jul 2026", summary: "Attractive suburban/rural edge and wildlife refuge access; selection tightens near the ceiling.", water: "Wetlands and refuge context; screen every parcel.", school: "Sherwood SD", schoolUrl: "https://sherwood.k12.or.us/departments/transportation/boundary-maps/", redfin: "https://www.redfin.com/city/17173/OR/Sherwood/homes-for-sale-under-700000", zillow: "https://www.zillow.com/sherwood-or/", fit: { intel: "variable", nike: "workable", lam: "strong", portland: "variable" } },
+  { key: "newberg", name: "Newberg / Dundee", x: 170, y: 455, market: "About $547k · Jul 2026", summary: "Wine-country beauty and more house; Intel and central Portland commutes are the least dependable.", water: "Willamette/Yamhill context; views do not guarantee access.", school: "Newberg-Dundee SD", schoolUrl: "https://www.newberg.k12.or.us/apps/pages/index.jsp?pREC_ID=2420931&type=d&uREC_ID=3680826", redfin: "https://www.redfin.com/city/13439/OR/Newberg/homes-for-sale-under-700000", zillow: "https://www.zillow.com/newberg-or/", fit: { intel: "stretched", nike: "variable", lam: "workable", portland: "stretched" } },
+  { key: "wilsonville", name: "Wilsonville", x: 350, y: 450, market: "About $680k · Jul 2026", summary: "Willamette River access and strong Lam fit; near the ceiling and weak for Intel.", water: "Willamette access; inspect flood, bank and insurance facts.", school: "West Linn-Wilsonville SD", schoolUrl: "https://www.wlwv.k12.or.us/departments/superintendents-office/transfer-information", redfin: "https://www.redfin.com/city/30773/OR/Wilsonville/homes-for-sale-under-700000", zillow: "https://www.zillow.com/wilsonville-or/", fit: { intel: "stretched", nike: "variable", lam: "strong", portland: "workable" } },
+  { key: "west-linn", name: "West Linn / Lake Oswego", x: 430, y: 355, market: "West Linn ~$828k; Lake Oswego ~$1.05m · Jul 2026", summary: "Water-and-beauty benchmark; detached family inventory below the ceiling is atypical.", water: "Willamette and lake context; price, access and hazards are property-specific.", school: "WLWV or Lake Oswego SD", schoolUrl: "https://www.losdschools.org/about-losd/registration-transfers/school-attendance-boundary-maps", redfin: "https://www.redfin.com/city/20123/OR/West-Linn/homes-for-sale-under-700000", zillow: "https://www.zillow.com/west-linn-or/", fit: { intel: "stretched", nike: "variable", lam: "workable", portland: "workable" } },
+];
+
+export const jobAnchors = [
+  { key: "intel", name: "Intel · Hillsboro", x: 178, y: 148, note: "Verified major R&D/manufacturing location; role and campus still control." },
+  { key: "nike", name: "Nike WHQ · Beaverton", x: 282, y: 214, note: "Verified headquarters and current Beaverton career filter." },
+  { key: "lam", name: "Lam · Tualatin", x: 330, y: 365, note: "Verified manufacturing anchor; Oregon footprint also includes Hillsboro/Sherwood." },
+  { key: "portland", name: "Portland professional services", x: 397, y: 205, note: "Deloitte office verified. Microsoft remote/transfer and NVIDIA roles require confirmation." },
+];
+
+export const waterways = [
+  { name: "Columbia River", points: "40,45 150,52 265,42 480,55" },
+  { name: "Willamette River", points: "430,80 405,170 420,255 395,340 365,470" },
+  { name: "Tualatin River", points: "65,255 155,270 255,300 325,340 395,335" },
+  { name: "Yamhill River", points: "115,462 175,448 255,462" },
 ];
 
 export const sources = [
-  { group: "Career geography", date: "Q1 2024 data; accessed Sep 2, 2026", label: "City of Hillsboro — Key Industries", url: "https://www.hillsboro-oregon.gov/our-city/departments/economic-development/key-industries", note: "Intel anchors a dense Hillsboro semiconductor ecosystem; headcounts are not current openings." },
-  { group: "Career geography", date: "Accessed Sep 2, 2026", label: "Intel — United States locations", url: "https://www.intel.com/content/www/us/en/jobs/locations/united-states.html", note: "Hillsboro is a major R&D and manufacturing site; validate each role's location and work model." },
-  { group: "Career geography", date: "Accessed Sep 2, 2026", label: "Lam Research — Locations", url: "https://www.lamresearch.com/company/locations/", note: "Tualatin facilities make the Tigard–Tualatin corridor relevant." },
-  { group: "Career geography", date: "Accessed Sep 2, 2026", label: "NVIDIA careers", url: "https://jobs.nvidia.com/", note: "A role-by-role lead only—not a relocation premise." },
-  { group: "Housing orientation", date: "July 2026", label: "Redfin — Hillsboro housing market", url: "https://www.redfin.com/city/8712/OR/Hillsboro/housing-market", note: "All-home-type median sale price: about $529,235; not a budget or appraisal." },
-  { group: "Housing orientation", date: "July 2026", label: "Redfin — Tigard housing market", url: "https://www.redfin.com/city/18733/OR/Tigard/housing-market", note: "All-home-type median sale price: about $599,675; not a budget or appraisal." },
-  { group: "Rent orientation", date: "Aug 31, 2026", label: "Zillow Rental Manager — Hillsboro", url: "https://www.zillow.com/rental-manager/market-trends/hillsboro-or/", note: "Asking-rent averages: about $2,500 for 3BR and $3,106 for 4BR; replace with matched dog-compatible listings." },
-  { group: "Rent orientation", date: "Aug 27, 2026", label: "Zillow Rental Manager — Tigard", url: "https://www.zillow.com/rental-manager/market-trends/tigard-or/", note: "Asking-rent averages: about $2,595 for 3BR and $3,700 for 4BR; replace with matched dog-compatible listings." },
-  { group: "Financing", date: "Aug 27, 2026", label: "Freddie Mac — Mortgage rates and affordability", url: "https://myhome.freddiemac.com/buying/mortgage-rates", note: "6.66% national 30-year fixed benchmark; not a quote or forecast." },
-  { group: "Financing", date: "Accessed Sep 2, 2026", label: "CFPB — Determine your down payment", url: "https://www.consumerfinance.gov/owning-a-home/prepare/determine-your-down-payment/", note: "Closing-cost orientation; replace with lender Loan Estimates." },
-  { group: "Taxes", date: "Accessed Sep 2, 2026", label: "Oregon Department of Revenue — Property tax", url: "https://www.oregon.gov/DOR/programs/property/Pages/personal-property.aspx", note: "Tax depends on assessed value and district rates; sale price is not the tax basis." },
-  { group: "Land + build", date: "Accessed Sep 2, 2026", label: "Hillsboro — Permitting rates and fees", url: "https://www.hillsboro-oregon.gov/services/permitting-center/rates-fees", note: "Zoning review, site work, utilities, and system-development charges may apply." },
-  { group: "Land + build", date: "Accessed Sep 2, 2026", label: "Tigard — System development charges", url: "https://www.tigard-or.gov/your-government/departments/community-development/permit-center/system-development-charges-sdc", note: "Charges vary by project and update; obtain a 2027 estimate." },
-  { group: "Family timing", date: "2027–28 calendar", label: "Hillsboro School District calendar", url: "https://www.hsd.k12.or.us/fs/resource-manager/view/159309f8-0339-4883-8dc3-a066c3b4446f", note: "Supports a separate late-August physical move and Sep 1 school-ready milestone." },
-  { group: "Family timing", date: "2027–28 calendar", label: "Tigard-Tualatin School District calendar", url: "https://www.ttsdschools.org/fs/resource-manager/view/f26bea5f-fa9a-4842-b0f3-a13e7b5251b7", note: "School assignment is address-specific; city or mailing address is not enough." },
+  { group: "Current-home research", date: "Accessed Sep 2, 2026", label: "Pierce County — parcel and property information", url: "https://www.piercecountywa.gov/969/Parcel-Property-Information", note: "Use privately for assessed value, tax and parcel facts. An assessment is not an expected sale price." },
+  { group: "Current-home research", date: "Accessed Sep 2, 2026", label: "Redfin — home-value entry point", url: "https://www.redfin.com/what-is-my-home-worth", note: "Automated values are a range input only; replace with a local CMA and seller net sheets." },
+  { group: "Career geography", date: "Accessed Sep 2, 2026", label: "Intel — United States locations", url: "https://www.intel.com/content/www/us/en/jobs/locations/united-states.html", note: "Hillsboro is a major R&D and manufacturing site; validate each role's campus and work model." },
+  { group: "Career geography", date: "Accessed Sep 2, 2026", label: "Lam Research — U.S. manufacturing", url: "https://www.lamresearch.com/careers/global-opportunities/us-manufacturing/", note: "Tualatin is a verified manufacturing anchor; openings change." },
+  { group: "Career geography", date: "Accessed Sep 2, 2026", label: "Nike — Beaverton jobs", url: "https://careers.nike.com/jobs?location_name=97225&location_type=1&page_number=1", note: "A live location-filtered search, not an employment promise." },
+  { group: "Career geography", date: "Accessed Sep 2, 2026", label: "Deloitte — Portland office", url: "https://www.deloitte.com/us/en/offices/us-locations/portland.html", note: "Verified Northwest Portland office; a role's travel and work model still matter." },
+  { group: "Career geography", date: "Accessed Sep 2, 2026", label: "Microsoft — global locations", url: "https://careers.microsoft.com/v2/global/en/locations.html", note: "Portland is not listed; treat continued employment as remote or transfer to confirm." },
+  { group: "Career geography", date: "Accessed Sep 2, 2026", label: "NVIDIA careers", url: "https://jobs.nvidia.com/", note: "Hillsboro role signals can expire; do not treat them as a permanent campus or guaranteed opening." },
+  { group: "Housing searches", date: "Live search; linked Sep 2, 2026", label: "Redfin — Hillsboro homes under $700k", url: "https://www.redfin.com/city/8712/OR/Hillsboro/homes-for-sale-under-700000", note: "Inventory changes continuously. Reapply bedroom, lot, pet, school, and commute filters." },
+  { group: "Housing searches", date: "Live search; linked Sep 2, 2026", label: "Redfin — Tigard homes under $700k", url: "https://www.redfin.com/city/18733/OR/Tigard/homes-for-sale-under-700000", note: "Inventory changes continuously; save only neutral nicknames in the local notebook." },
+  { group: "Financing", date: "Aug 27, 2026", label: "Freddie Mac — mortgage rates and affordability", url: "https://myhome.freddiemac.com/buying/mortgage-rates", note: "6.66% national 30-year benchmark used in the example; not a quote or 2027 forecast." },
+  { group: "Financing", date: "Accessed Sep 2, 2026", label: "CFPB — determine your down payment", url: "https://www.consumerfinance.gov/owning-a-home/prepare/determine-your-down-payment/", note: "Use lender Loan Estimates for actual cash-to-close, insurance and mortgage insurance." },
+  { group: "Schools", date: "Adopted May 26, 2026 · revised Jun 25, 2026", label: "Hillsboro SD — 2027–28 calendar", url: "https://www.hsd.k12.or.us/calendar", note: "Grades 1–6, 7, and 9 start Aug 31, 2027; other K–12 grades start Sep 1. Verify address assignment and later revisions." },
+  { group: "Schools", date: "Adopted Mar 9, 2026", label: "Tigard-Tualatin SD — 2027–28 calendar", url: "https://www.ttsdschools.org/calendars/2027-2028-district-school-year-calendar", note: "Grades 1–6 and 9 start Aug 31, all grades 1–12 attend Sep 1, and Pre-K/K start Sep 8. Placement remains program- and address-specific." },
+  { group: "Schools", date: "Accessed Sep 2, 2026", label: "Oregon — school and district profiles", url: "https://www.oregon.gov/ode/schools-and-districts/reportcards/reportcards/pages/default.aspx", note: "Compare official data, then verify the exact address assignment with the district." },
+  { group: "Hazards", date: "Accessed Sep 2, 2026", label: "Oregon HazVu — statewide geohazards", url: "https://www.oregon.gov/dogami/hazvu/pages/index.aspx", note: "Screen flood, landslide, earthquake and other hazards; the viewer is not a survey or guarantee." },
+  { group: "Hazards", date: "Accessed Sep 2, 2026", label: "Oregon OEM — flood maps", url: "https://www.oregon.gov/oem/emresources/Plans_Assessments/riskmap/Pages/Flood-Maps.aspx", note: "Water-oriented candidates require flood-map, wetlands, bank, access and insurance diligence." },
+  { group: "Land + build", date: "Accessed Sep 2, 2026", label: "Washington County — GIS", url: "https://www.washingtoncountyor.gov/gis", note: "Parcel orientation only; verify jurisdiction, zoning, utilities and buildability in writing." },
+  { group: "Land + build", date: "Accessed Sep 2, 2026", label: "Oregon — well-log query", url: "https://apps.wrd.state.or.us/apps/gw/well_log/default.aspx", note: "A nearby log does not prove a parcel's water capacity or quality." },
 ];

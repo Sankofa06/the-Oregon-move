@@ -1,5 +1,62 @@
 # Oregon Move Workforce Record
 
+## V2 commission — September 2, 2026
+
+- Outcome and audience: turn the delivered planning page into a private-working tool for the couple while preserving the reality that the GitHub Pages URL and tracked repository are public.
+- Inspectable deliverables: a schematic regional map; current public job, school, area, water, and listing-search references; a local candidate notebook; an editable Gantt-style roadmap; separate browser-local “My view” and “Partner view” workspaces; and a sale/debt/affordability model that can be initialized from a gitignored private file.
+- Definition of done: both workspaces can be edited, saved locally by explicit opt-in, exported, imported, and switched without cross-contamination; map layers and candidate pins work; the sale range and ownership affordability math reconcile; timeline edits update the Gantt; current links are dated and reachable; no private household values or address enter tracked Git; the public Pages deployment passes the repository check and a fresh acceptance review.
+- Preservation set: retain the v1 four-path comparison, blank private start, illustrative public example, local-only persistence, import/export allowlisting, accessibility behavior, responsive layouts, Content Security Policy, test coverage, and source traceability.
+- Delivery authority: the user explicitly requested a push for review tonight. This authorizes scoped commits, push to the existing public repository, and Pages verification; it does not authorize publishing private inputs, third-party outreach, applications, offers, purchases, or account changes.
+- Crew mode: Full; assurance depth: Standard. Grounding lanes are read-only, the lead owns integration and publishing, and a fresh critic must review the frozen artifact before release.
+
+### V2 decisions
+
+- DEC-101: GitHub Pages is public even if the expected audience is two people. Exact address, salaries, mortgage balance, debt detail, children’s personal details, and other household truth stay in a gitignored starter file, browser storage, or exported JSON.
+- DEC-102: Tonight’s version uses two independent local workspaces plus JSON handoff. Secure cross-device synchronization would require authenticated storage and is outside a static Pages deployment.
+- DEC-103: The map is a dependency-free schematic SVG with no map tiles, remote scripts, geocoder, or network request generated from private inputs.
+- DEC-104: Zillow and Redfin are linked through current search pages rather than scraped or republished. Specific candidates are entered into the local notebook and remain in the active workspace.
+- DEC-105: Commute bands are orientation estimates only. Every candidate must be checked against the actual worksite, shift, route, and travel time before a decision.
+- DEC-106: The working search ceiling is editable and can model a $700,000 purchase; the interface must distinguish an income-based ceiling from cash-to-close, debt-to-income, reserve, and comfort constraints.
+- DEC-107: Area exploration expands beyond Hillsboro and Tigard to west- and southwest-Portland candidates, including Newberg and water-adjacent options, without ranking a winner before jobsite and property-specific evidence exist.
+
+### V2 gate matrix
+
+| Gate | Requirement | Oracle | State |
+|---|---|---|---|
+| G101 Privacy boundary | No address, exact household income/mortgage/debt, child-specific details, or private-source exports in tracked Git | tracked-file scan + gitignored starter check | Pass — targeted scan clean; starter and both current/legacy export patterns are ignored and checked |
+| G102 Financial model | Sale low/working/high cases, planned debt payoff, usable move funds, gross-income DTI ceilings, comfort ceiling, and scenario headroom reconcile | deterministic unit tests + browser checks | Pass — 20/20 deterministic tests; illustrative browser values reconcile |
+| G103 Dual workspaces | Independent local opt-in save, switch, clear, export, and import for each partner view | unit/browser persistence tests | Pass — distinct allowlisted keys; browser switch test retained separate values, candidate count, and task status |
+| G104 Map and exploration | Jobs, areas, schools, water context, listing-search links, map filters, and local candidate pins are usable | source audit + browser interaction | Pass — 12 areas, four career lenses, waterways, district context, live searches, local notebook, and candidate pin tested |
+| G105 Editable roadmap | A readable Gantt updates from target date, task duration, due date, owner, and status edits | deterministic tests + browser interaction | Pass — date/duration geometry tests and browser status edit passed; mobile chart is horizontally contained |
+| G106 Accessibility/responsiveness | New controls, map alternative, Gantt, and candidate notebook work at keyboard/mobile/desktop sizes | automated inspection + browser review | Pass — labeled text alternative, 390px/1280px review, no page overflow, private inputs/outputs visibly obscure, and clean console |
+| G107 Truth/traceability | Current material claims and outbound search/reference links are dated, scoped, and reachable | source registry + link checks | Pass with vendor caveat — adopted 2027–28 calendars corrected and linked; 21 links returned 200; other vendor pages returned bot-protection 403 rather than 404/DNS failures |
+| G108 Delivery | Exact accepted artifact is pushed, Pages run succeeds, live HTTPS returns 200, and no self-hosted billable-time rule is violated | git/GitHub/API/live checks | Pending |
+| G109 Couple clarity | A fresh reader can tell what is known, what is estimated, what differs between workspaces, and the next decision | fresh acceptance critic | Pass — fresh rc3 release critic returned GO with no severity 3/2/1 findings |
+
+### V2 active risks
+
+- RSK-101 / S2 MATERIAL: Browser local storage does not synchronize between devices or browsers. Mitigation: make the boundary explicit and provide JSON export/import for handoff.
+- RSK-102 / S2 MATERIAL: “What we can truly afford” cannot be settled from salaries and a home-value estimate alone. Recurring debt payments, credit, actual rates, taxes, insurance, childcare, sale proceeds, and desired reserve remain required inputs.
+- RSK-103 / S1 LOCAL: Listing inventory, valuations, rates, jobs, school boundaries, and drive times can change daily. Mitigation: link live searches and official lookup tools, date orientation data, and keep candidates editable.
+- RSK-104 / S1 LOCAL: A water view is not the same as waterfront access and can add flood, insurance, slope, or environmental constraints. Mitigation: treat water as a map/search preference and require parcel-level diligence.
+- RSK-105 / S2 MATERIAL: A public static site cannot safely provide shared cloud persistence without an authenticated backend. Mitigation: no hidden telemetry or outbound storage; defer true synchronization.
+
+### V2 current state
+
+- State: ACCEPTED(rc3); fresh release criticism returned GO and only G108 deployment verification remains pending.
+- Canonical repository: this checkout, branch `main`, remote `origin`.
+- Frozen artifact identity: SHA-256 `8ec0a893d02628d2ae4636cd573882a98313e380f7dbd1453bc49b021549c23c` over `.gitignore`, `README.md`, and the sorted tracked delivery files under `docs/`, `landing-page/`, `scripts/`, and `.github/workflows/`.
+
+### V2 acceptance findings and repairs
+
+- V2-ISS-101 / S2 MATERIAL / repaired and verified: current export filenames were not covered by the ignore rule or privacy scan. Exports now include a `private` marker, current and legacy patterns are ignored, the check detects either pattern, and `git check-ignore` passes both examples.
+- V2-ISS-102 / S2 MATERIAL / repaired and verified: the screen-share toggle obscured calculated outputs but not editable private values. It is now disabled for the public example and obscures private text/date/number/URL/select/textarea controls plus financial outputs; computed browser styles confirm `blur(8px)` on number, URL, note, and output samples.
+- V2-ISS-103 / S2 MATERIAL / repaired and verified: the release candidate incorrectly said 2027–28 calendars were unpublished. Official district sources confirm adopted calendars; the site now identifies the August 31 K–12 start window and TTSD's September 8 Pre-K/K start while keeping household grade details private and preschool placement program-specific.
+- V2-ISS-104 / S1 LOCAL / repaired and verified: the countdown used the UTC calendar date, which could be one day short in Pacific evenings. It now derives the default from the browser's local calendar date; deterministic test and browser display both show 364 days from September 2, 2026 to September 1, 2027.
+- V2-ISS-105 / assurance gap / repaired: `.gitignore` is included in the rc3 fingerprint scope.
+- V2-ISS-106 / privacy hardening / repaired and verified: the public illustrative household composition no longer mirrors the private family description, and the roadmap refers to district classes rather than household grade details; the targeted tracked-file scan is clean.
+- V2-ISS-107 / release acceptance / verified: a fresh critic independently matched the rc3 fingerprint, reran 20/20 tests and diff checks, exercised private-value hiding and My/Partner workspace isolation at desktop and mobile sizes, and returned GO with no material findings. One narrow-map employer label may truncate visually; the accessible adjacent area list retains the full label.
+
 ## Commission and non-goals
 
 - Outcome and audience: a clear, couple-friendly roadmap for moving a family with children and dogs to the Hillsboro or Tigard area by September 1, 2027, with a semiconductor-career path and inspectable housing/finance scenarios.

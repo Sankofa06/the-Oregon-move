@@ -2,7 +2,7 @@
 private/
 exports/
 *.private.json
-oregon-move-private-plan-*.json
+oregon-move-private-*.json
+oregon-move-*-model-*.json
 reports/browser/
 node_modules/
-

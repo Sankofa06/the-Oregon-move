@@ -21,6 +21,7 @@ required=(
   landing-page/public-data.mjs
   scripts/model.test.mjs
   .github/workflows/pages.yml
+  .gitignore
 )
 for file in "${required[@]}"; do
   test -f "$file" || { echo "Missing required file: $file" >&2; exit 1; }
@@ -31,7 +32,7 @@ node --check landing-page/model.mjs
 node --check landing-page/public-data.mjs
 node --test scripts/model.test.mjs
 
-scan_targets=(landing-page scripts .github/workflows README.md docs AGENTS.md WORKFORCE.md)
+scan_targets=(landing-page scripts .github/workflows README.md docs AGENTS.md WORKFORCE.md .gitignore)
 
 absolute_pattern='/''Users/|file:''//'
 if search -n "$absolute_pattern" "${scan_targets[@]}"; then
@@ -39,7 +40,7 @@ if search -n "$absolute_pattern" "${scan_targets[@]}"; then
   exit 1
 fi
 
-if find . -type f -name 'oregon-move-private-plan-*.json' -print -quit | grep -q .; then
+if find . -type f \( -name 'oregon-move-private-*.json' -o -name 'oregon-move-*-model-*.json' \) -print -quit | grep -q .; then
   echo "Privacy failure: exported private plan file is tracked in the project tree." >&2
   exit 1
 fi
@@ -70,12 +71,21 @@ if search -n 'innerHTML|insertAdjacentHTML|document\.write' landing-page; then
 fi
 
 search -q "connect-src 'none'" landing-page/index.html
-search -q 'Save on this device' landing-page/index.html
+search -q 'Save this model on this device' landing-page/index.html
 search -q 'Browser storage is not a vault' landing-page/index.html
 search -q 'Illustrative example' landing-page/index.html
 search -q 'View source on GitHub' landing-page/index.html
+search -q 'My model' landing-page/index.html
+search -q 'Partner model' landing-page/index.html
+search -q 'region-map' landing-page/index.html
+search -q 'candidate-form' landing-page/index.html
+search -q 'Editable 12-month Gantt' landing-page/index.html
+search_fixed -q 'oregonMove.workspace.v2.${slot}' landing-page/model.mjs
 search_fixed -q 'if (!input.dataset.modelPath && !input.dataset.path) return;' landing-page/app.mjs
 search_fixed -q 'byId("hide-values").addEventListener("change"' landing-page/app.mjs
+search_fixed -q 'oregon-move-private-${activeWorkspace}-model-' landing-page/app.mjs
+search_fixed -q 'oregon-move-private-*.json' .gitignore
+search_fixed -q 'body.private-plan.hide-values input:not' landing-page/overrides.css
 search_fixed -q 'byId("save-device").addEventListener("change"' landing-page/app.mjs
 
 workflow=.github/workflows/pages.yml
