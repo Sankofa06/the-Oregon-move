@@ -13,8 +13,8 @@
 
 - Crew mode: Full, because research, planning, interactive implementation, and public delivery have distinct evidence outputs that must be integrated.
 - Assurance depth: Standard.
-- Current state: REVISED(v2); first criticism stopped on material gaps, repairs and direct checks passed, and a new snapshot is being frozen for a different critic.
-- Artifact identity: `the-Oregon-move` v2 snapshot, identified by the next local commit supplied to the repeat critic.
+- Current state: REVISED(v3); the repeat critic cleared G1–G4 and G6–G8 but found a remaining G5 contrast failure; final repairs and direct checks passed, and a third snapshot is being frozen.
+- Artifact identity: `the-Oregon-move` v3 snapshot, identified by the next local commit supplied to the final critic.
 
 ## Ready work and dependencies
 
@@ -58,7 +58,7 @@
 | G2 Decision completeness | Four housing paths, Hillsboro/Tigard comparison, current-home sale roadmap, career plan, and 12-month timeline | content inspection | Pass — site and `docs/PLAN.md` cover every surface |
 | G3 Financial model | Editable assumptions with cash-to-close, monthly housing, runway, and gap comparisons; no false precision | deterministic browser tests | Pass — 11/11 model tests; live sale/date/HOA recalculation verified; cards now expose entry, committed, available, and post-move cash |
 | G4 Privacy and safety | No PII/private financial values in git; local save/export/import clearly explained | scripted scans + manual inspection | Pass — `scripts/check.sh`; blank private start verified across 78 inputs; opt-out race test returned to the unsaved example; no outbound-request API; CSP `connect-src 'none'` |
-| G5 Usability/accessibility | Responsive, keyboard usable, visible focus, sufficient contrast, reduced-motion support | browser inspection at mobile/desktop sizes | Pass locally — 320/768/1280 render, no overflow, labeled controls, landmarks, 44px key targets; text-accent contrast 5.30:1 on paper and pressed-control contrast 5.69:1 |
+| G5 Usability/accessibility | Responsive, keyboard usable, visible focus, sufficient contrast, reduced-motion support | browser inspection at mobile/desktop sizes | Pass locally — 320/768/1280 render, no overflow, labeled controls, landmarks, 44px key targets; text accents pass at 5.30:1 or better, including 8.75:1 yellow-on-deep; import is a native button |
 | G6 Truth/traceability | Material current claims carry source and as-of date; uncertainty is explicit | source registry audit | Pass — dated public source cards plus full `docs/SOURCES.md` registry |
 | G7 Delivery | Pages workflow valid; repository and actual Pages URL confirmed; live site returns HTTP 200 | GitHub/API/workflow/site checks | Pending |
 | G8 Couple clarity | A first-time reader can see status, next decision, path tradeoffs, and what to do this month | blind critic | Pending |
@@ -72,7 +72,10 @@
 - ISS-005 / S2 MATERIAL / applied and directly verified: scenario cards hid transition, setup, and moving cash inside reserve math. Cards expose total move cash, available funds, and cash after move alongside entry cash; the land example visibly reconciles $205,432 entry cash to $265,632 total move cash.
 - ISS-006 / S1 LOCAL / applied and directly verified: small clay text and white text on clay missed WCAG AA contrast. The revised token measures 5.30:1 on paper and 5.69:1 with off-white control text, with context-specific dark-section overrides.
 - ISS-007 / S2 MATERIAL / applied and directly verified: opting out of browser saving or clearing a plan could race a pending debounced write. Both actions cancel the timer, the callback rechecks mode and consent before storage, and a browser opt-out race returned to the illustrative example after reload.
+- ISS-008 / S2 MATERIAL / applied and directly verified: the emphasized place heading retained a clay-on-deep pairing at 2.47:1. Browser-computed styles now measure yellow on deep at 8.75:1.
+- ISS-009 / S1 LOCAL / applied and directly verified: the visually hidden file input received keyboard focus without a visible proxy. Import is a native visible button covered by the global focus indicator; it opens a labeled file input removed from sequential focus.
+- ISS-010 / S1 LOCAL / applied and directly verified: UI ranges were looser than envelope validation, allowing values that could be stored but rejected on reload. Field bounds match the schema, every debounced write validates before storage, and a live 51-year input produced `aria-invalid` with the 1–50-year correction.
 
 ## Pending authority / next action
 
-- Freeze v2 and obtain a clean verdict from a different fresh acceptance critic before publication. Exact private financial inputs and a final housing-path choice remain user-owned follow-up decisions.
+- Freeze v3 and obtain a clean verdict from a different fresh acceptance critic before publication. Exact private financial inputs and a final housing-path choice remain user-owned follow-up decisions.

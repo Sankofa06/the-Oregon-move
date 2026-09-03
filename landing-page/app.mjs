@@ -105,8 +105,10 @@ function createField(path, labelText, unit, kind) {
   input.id = id;
   input.type = "number";
   input.inputMode = kind === "integer" ? "numeric" : "decimal";
-  input.min = "0";
-  input.max = kind === "percent" ? (labelText.includes("Mortgage") ? "30" : "100") : "100000000";
+  input.min = kind === "integer" && labelText.includes("term") ? "1" : "0";
+  input.max = kind === "percent"
+    ? (labelText.includes("Mortgage") ? "30" : "100")
+    : kind === "integer" ? (labelText.includes("term") ? "50" : "60") : "100000000";
   input.step = kind === "integer" ? "1" : kind === "percent" ? "0.01" : "100";
   input.dataset.modelPath = path;
   input.dataset.kind = kind;
@@ -275,6 +277,12 @@ function scheduleSave() {
       return;
     }
     try {
+      validateEnvelope(envelope);
+    } catch (error) {
+      announce(`Not saved: ${error.message}`);
+      return;
+    }
+    try {
       envelope.revision += 1; envelope.updatedAt = new Date().toISOString();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(envelope)); dirty = false;
       announce(`Saved on this browser at ${new Date(envelope.updatedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}.`);
@@ -322,11 +330,16 @@ function onInput(event) {
   if (planMode !== "private") return;
   if (input.dataset.modelPath) {
     const raw = input.value.trim();
-    let value = raw === "" ? null : Number(raw);
-    if (input.dataset.kind === "percent" && value !== null) value /= 100;
-    if (value !== null && (!Number.isFinite(value) || value < 0)) {
-      input.setAttribute("aria-invalid", "true"); input.nextElementSibling.textContent = "Enter zero or a positive number."; return;
+    const displayValue = raw === "" ? null : Number(raw);
+    const minimum = Number(input.min);
+    const maximum = Number(input.max);
+    if (displayValue !== null && (!Number.isFinite(displayValue) || displayValue < minimum || displayValue > maximum)) {
+      input.setAttribute("aria-invalid", "true");
+      input.nextElementSibling.textContent = `Enter a value from ${minimum} to ${maximum.toLocaleString()}.`;
+      return;
     }
+    let value = displayValue;
+    if (input.dataset.kind === "percent" && value !== null) value /= 100;
     if (input.dataset.kind === "integer" && value !== null && !Number.isInteger(value)) {
       input.setAttribute("aria-invalid", "true"); input.nextElementSibling.textContent = "Enter a whole number."; return;
     }
@@ -400,6 +413,7 @@ byId("export-plan").addEventListener("click", () => {
   link.href = url; link.download = `oregon-move-private-plan-${new Date().toISOString().slice(0, 10)}.json`; link.click(); URL.revokeObjectURL(url);
   announce("Private JSON exported. The file is unencrypted.");
 });
+byId("import-trigger").addEventListener("click", () => byId("import-file").click());
 byId("import-file").addEventListener("change", async (event) => {
   const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
   try {

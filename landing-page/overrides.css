@@ -13,6 +13,10 @@
   color: #f3c465;
 }
 
+.place-section h2 em {
+  color: #f3c465;
+}
+
 .career-gate .eyebrow {
   color: var(--deep);
 }

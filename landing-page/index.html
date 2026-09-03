@@ -103,8 +103,8 @@
           <label class="check-control"><input id="save-device" type="checkbox" disabled> Save on this device</label>
           <label class="check-control"><input id="hide-values" type="checkbox"> Hide dollar values</label>
           <button id="export-plan" class="button secondary" type="button" disabled>Export JSON</button>
-          <label class="button secondary file-button" for="import-file">Import JSON</label>
-          <input id="import-file" class="visually-hidden" type="file" accept="application/json,.json">
+          <button id="import-trigger" class="button secondary" type="button">Import JSON</button>
+          <input id="import-file" class="visually-hidden" type="file" accept="application/json,.json" aria-label="Choose private plan JSON file" tabindex="-1">
           <button id="clear-plan" class="button danger" type="button" disabled>Clear private plan</button>
         </div>
         <div id="conflict" class="conflict" hidden role="status">
