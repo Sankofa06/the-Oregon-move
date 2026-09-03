@@ -13,8 +13,8 @@
 
 - Crew mode: Full, because research, planning, interactive implementation, and public delivery have distinct evidence outputs that must be integrated.
 - Assurance depth: Standard.
-- Current state: REVISED(v4); the third critic confirmed the prior repairs but found a checkbox event-order regression; the routing guard and direct browser regression now pass, and a final snapshot is being frozen.
-- Artifact identity: `the-Oregon-move` v4 snapshot, identified by the next local commit supplied to the final critic.
+- Current state: DELIVERED(v4); final fresh criticism returned GO, the accepted site was published, and live verification passed.
+- Artifact identity: site behavior accepted at `a04cdecc442ac0bae0920b8be5e89c26ea584b8c`; portable verification added at deployed snapshot `4b00271cd1930da99cdb34c9b5d119587b03f57f`; Pages run `33702087529`.
 
 ## Ready work and dependencies
 
@@ -60,8 +60,8 @@
 | G4 Privacy and safety | No PII/private financial values in git; local save/export/import clearly explained | scripted scans + manual inspection | Pass — `scripts/check.sh`; blank private start verified across 78 inputs; save/opt-out toggles and race test passed; reload returned to the unsaved example; no outbound-request API; CSP `connect-src 'none'` |
 | G5 Usability/accessibility | Responsive, keyboard usable, visible focus, sufficient contrast, reduced-motion support | browser inspection at mobile/desktop sizes | Pass locally — 320/768/1280 render, no overflow, labeled controls, landmarks, 44px key targets; text accents pass at 5.30:1 or better, including 8.75:1 yellow-on-deep; import is a native button |
 | G6 Truth/traceability | Material current claims carry source and as-of date; uncertainty is explicit | source registry audit | Pass — dated public source cards plus full `docs/SOURCES.md` registry |
-| G7 Delivery | Pages workflow valid; repository and actual Pages URL confirmed; live site returns HTTP 200 | GitHub/API/workflow/site checks | Pending |
-| G8 Couple clarity | A first-time reader can see status, next decision, path tradeoffs, and what to do this month | blind critic | Pending |
+| G7 Delivery | Pages workflow valid; repository and actual Pages URL confirmed; live site returns HTTP 200 | GitHub/API/workflow/site checks | Pass — public repository confirmed; run `33702087529` succeeded on `4b00271`; `https://sankofa06.github.io/the-Oregon-move/` returned HTTP 200 over HTTPS |
+| G8 Couple clarity | A first-time reader can see status, next decision, path tradeoffs, and what to do this month | blind critic | Pass — final fresh critic returned GO with the opening status, four paths, tradeoffs, and next action intact |
 
 ## Open findings and fixes
 
@@ -76,8 +76,8 @@
 - ISS-009 / S1 LOCAL / applied and directly verified: the visually hidden file input received keyboard focus without a visible proxy. Import is a native visible button covered by the global focus indicator; it opens a labeled file input removed from sequential focus.
 - ISS-010 / S1 LOCAL / applied and directly verified: UI ranges were looser than envelope validation, allowing values that could be stored but rejected on reload. Field bounds match the schema, every debounced write validates before storage, and a live 51-year input produced `aria-invalid` with the 1–50-year correction.
 - ISS-011 / S2 MATERIAL / applied and directly verified: the document-level numeric/date input handler also received checkbox input events and re-rendered stale preferences before checkbox change handlers ran. It returns for non-model/non-path controls, `scripts/check.sh` asserts the routing guard, and the browser regression verified save on, saved status, hide on/off, save off, memory-only status, and illustrative mode after reload.
-- ISS-012 / S1 LOCAL / applied; delivery re-verification pending: the first GitHub-hosted Pages run passed all 11 tests but the privacy scan could not start because `rg` was absent. The verification script now prefers `rg` and falls back to recursive `grep` with equivalent regex/fixed-string modes.
+- ISS-012 / S1 LOCAL / applied and directly verified: the first GitHub-hosted Pages run passed all 11 tests but the privacy scan could not start because `rg` was absent. The verification script prefers `rg` and falls back to recursive `grep`; both local paths passed, and GitHub Pages run `33702087529` completed every step successfully.
 
 ## Pending authority / next action
 
-- Freeze v4 and obtain a clean verdict from a different fresh acceptance critic before publication. Exact private financial inputs and a final housing-path choice remain user-owned follow-up decisions.
+- Delivery is complete. The next user-owned action is to open the live page, start a blank private plan, and enter the current financial truth set together; exact private values and the final housing-path choice stay outside Git.
