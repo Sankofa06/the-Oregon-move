@@ -1,8 +1,20 @@
 /* Verification-driven accessibility and print corrections. */
+:root {
+  --clay: #a94731;
+}
+
 .status-cell input,
 .status-cell select,
 .focus-button {
   min-height: 44px;
+}
+
+.place-section .eyebrow {
+  color: #f3c465;
+}
+
+.career-gate .eyebrow {
+  color: var(--deep);
 }
 
 @media print {

@@ -164,11 +164,17 @@ function renderScenarios() {
   }
   for (const [key, scenario] of Object.entries(result.scenarios)) {
     const entry = document.querySelector(`[data-output="${key}.entryCash"]`);
+    const committed = document.querySelector(`[data-output="${key}.committedCash"]`);
+    const available = document.querySelector(`[data-output="${key}.availableFunds"]`);
+    const postMove = document.querySelector(`[data-output="${key}.postMoveCash"]`);
     const monthly = document.querySelector(`[data-output="${key}.monthly"]`);
     const cushion = document.querySelector(`[data-output="${key}.cushion"]`);
     const cashFlow = document.querySelector(`[data-output="${key}.cashFlow"]`);
     const runway = document.querySelector(`[data-output="${key}.runway"]`);
     entry.textContent = outputText(scenario.entryCash);
+    committed.textContent = outputText(scenario.committedCash);
+    available.textContent = outputText(scenario.availableMoveFunds);
+    postMove.textContent = outputText(scenario.postMoveCash);
     monthly.textContent = outputText(scenario.monthly.value, " / mo");
     cushion.textContent = reserveText(scenario);
     cashFlow.textContent = outputText(scenario.monthlyCashFlow, " / mo");
@@ -195,6 +201,9 @@ function renderStatus() {
   byId("next-action").textContent = next?.title || "All roadmap tasks are complete.";
   byId("next-action-meta").textContent = next ? `${next.phaseId} · ${next.owner} · due ${dateFormat.format(new Date(`${next.dueDate}T00:00:00Z`))}` : "Review together and refresh dated assumptions.";
   byId("mode-label").textContent = planMode === "private" ? "Private plan" : "Illustrative example";
+  byId("assumption-note").textContent = planMode === "private"
+    ? "Private workspace: financial fields begin blank. Enter your own values; nothing is stored unless you turn on Save on this device."
+    : "Example assumptions: 6.66% mortgage rate, 20% down, and illustrative tax, insurance, maintenance, income, cash, and current-home values. These are not quotes, a 2027 forecast, or this household’s private financials.";
   document.body.classList.toggle("private-plan", planMode === "private");
   document.body.classList.toggle("hide-values", envelope.plan.preferences.hideValues);
   byId("hide-values").checked = envelope.plan.preferences.hideValues;
@@ -260,6 +269,11 @@ function scheduleSave() {
   announce("Unsaved changes…");
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
+    saveTimer = null;
+    if (planMode !== "private" || !envelope.plan.preferences.saveOnDevice) {
+      announce("Memory-only · no private values were stored.");
+      return;
+    }
     try {
       envelope.revision += 1; envelope.updatedAt = new Date().toISOString();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(envelope)); dirty = false;
@@ -273,8 +287,20 @@ function scheduleSave() {
 }
 
 function startPrivate() {
-  envelope = clone(exampleEnvelope); envelope.updatedAt = new Date().toISOString(); envelope.mode = "private";
-  planMode = "private"; dirty = true; announce("Private plan started · memory-only until you opt into saving."); render();
+  envelope = clone(exampleEnvelope);
+  for (const fields of Object.values(fieldGroups)) {
+    for (const [path] of fields) {
+      const keys = path.split(".");
+      const final = keys.pop();
+      const target = keys.reduce((value, key) => value[key], envelope.plan);
+      target[final] = null;
+    }
+  }
+  envelope.plan.household = { adults: null, children: null, dogs: null };
+  envelope.updatedAt = new Date().toISOString(); envelope.mode = "private";
+  planMode = "private"; dirty = true;
+  announce("Blank private plan started · memory-only until you opt into saving. Enter your own financial assumptions.");
+  render();
 }
 
 function readStoredPlan() {
@@ -346,6 +372,7 @@ byId("save-device").addEventListener("change", (event) => {
   envelope.plan.preferences.saveOnDevice = event.target.checked;
   if (event.target.checked) scheduleSave();
   else {
+    clearTimeout(saveTimer); saveTimer = null;
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* memory-only is still safe */ }
     announce("Memory-only · the saved browser copy was removed.");
   }
@@ -361,6 +388,7 @@ byId("reset-roadmap").addEventListener("click", () => {
 });
 byId("clear-plan").addEventListener("click", () => {
   if (!window.confirm("Clear this planner's private browser copy and return to the illustrative example?")) return;
+  clearTimeout(saveTimer); saveTimer = null;
   try { localStorage.removeItem(STORAGE_KEY); } catch { /* already memory-only */ }
   envelope = clone(exampleEnvelope); planMode = "example"; dirty = false; announce("Private plan cleared. Illustrative example restored."); render();
 });
