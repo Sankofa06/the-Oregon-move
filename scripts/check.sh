@@ -66,6 +66,9 @@ rg -q 'Save on this device' landing-page/index.html
 rg -q 'Browser storage is not a vault' landing-page/index.html
 rg -q 'Illustrative example' landing-page/index.html
 rg -q 'View source on GitHub' landing-page/index.html
+rg -Fq 'if (!input.dataset.modelPath && !input.dataset.path) return;' landing-page/app.mjs
+rg -Fq 'byId("hide-values").addEventListener("change"' landing-page/app.mjs
+rg -Fq 'byId("save-device").addEventListener("change"' landing-page/app.mjs
 
 workflow=.github/workflows/pages.yml
 for action in 'actions/checkout@v7' 'actions/configure-pages@v6' 'actions/upload-pages-artifact@v5' 'actions/deploy-pages@v5'; do

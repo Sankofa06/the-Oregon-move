@@ -328,6 +328,7 @@ function readStoredPlan() {
 function onInput(event) {
   const input = event.target;
   if (planMode !== "private") return;
+  if (!input.dataset.modelPath && !input.dataset.path) return;
   if (input.dataset.modelPath) {
     const raw = input.value.trim();
     const displayValue = raw === "" ? null : Number(raw);
