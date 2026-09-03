@@ -4,6 +4,13 @@
 
 **Rule:** medians, automated valuations, maps, and commute-fit labels are orientation inputs—not appraisals, route guarantees, offers, leases, tax bills, school assignments, or proof that a parcel works.
 
+## Interactive basemap
+
+- [OpenStreetMap copyright and attribution](https://www.openstreetmap.org/copyright) — road, place, and water context displayed underneath the planner's markers.
+- [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/) — permits normal interactive browser viewing with visible attribution and browser caching; prohibits bulk downloading and says not to submit confidential data.
+
+The planner loads only the tiles visible in the current viewport, provides permanent attribution, does not prefetch or offer offline downloads, and keeps `connect-src 'none'`. The tile host receives normal browser network metadata and viewed-map tile coordinates; it does not receive the private plan or marker data as an application payload.
+
 ## Current-home sale research
 
 - [Pierce County parcel and property information](https://www.piercecountywa.gov/969/Parcel-Property-Information) — official entry point for parcel, assessed-value, and tax facts. An assessment is not expected sale price.

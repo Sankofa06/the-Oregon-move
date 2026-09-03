@@ -19,6 +19,7 @@ import {
   validateEnvelope,
   workspaceStorageKey,
 } from "../landing-page/model.mjs";
+import { candidateCoordinateIsValid, centerAfterZoom, projectCoordinate, unprojectCoordinate, visibleTiles } from "../landing-page/map.mjs";
 import { blankPrivateEnvelope, exampleEnvelope } from "../landing-page/public-data.mjs";
 
 const closeTo = (actual, expected, epsilon = 0.01) => assert.ok(Math.abs(actual - expected) <= epsilon, `${actual} ≠ ${expected}`);
@@ -107,6 +108,24 @@ test("schema rejects invalid rates, ordered ranges, debt relief, dates, rehab, a
 test("candidate validation rejects unsafe URLs and duplicate ids", () => {
   const unsafe = structuredClone(exampleEnvelope); unsafe.plan.candidates[0].url = "javascript:alert(1)"; assert.throws(() => validateEnvelope(unsafe), /HTTP/i);
   const duplicate = structuredClone(exampleEnvelope); duplicate.plan.candidates.push(structuredClone(duplicate.plan.candidates[0])); assert.throws(() => validateEnvelope(duplicate), /duplicated/i);
+  const halfPoint = structuredClone(exampleEnvelope); halfPoint.plan.candidates[0].latitude = 45.5; assert.throws(() => validateEnvelope(halfPoint), /both latitude and longitude/i);
+  const farPoint = structuredClone(exampleEnvelope); Object.assign(farPoint.plan.candidates[0], { latitude: 60, longitude: -122.8 }); assert.throws(() => validateEnvelope(farPoint), /latitude/i);
+});
+
+test("geographic map projection round-trips target-area coordinates", () => {
+  const coordinate = { latitude: 45.5229, longitude: -122.9898 }; const point = projectCoordinate(coordinate, 11); const restored = unprojectCoordinate(point, 11);
+  closeTo(restored.latitude, coordinate.latitude, 0.000001); closeTo(restored.longitude, coordinate.longitude, 0.000001); assert.equal(candidateCoordinateIsValid(coordinate.latitude, coordinate.longitude), true);
+});
+
+test("map zoom keeps the cursor anchor geographically stable", () => {
+  const center = { latitude: 45.45, longitude: -122.84 }; const width = 800; const height = 500; const x = 620; const y = 180;
+  const before = unprojectCoordinate({ x: projectCoordinate(center, 10).x + x - width / 2, y: projectCoordinate(center, 10).y + y - height / 2 }, 10);
+  const nextCenter = centerAfterZoom(center, 10, 11, width, height, x, y); const nextCenterPoint = projectCoordinate(nextCenter, 11); const after = unprojectCoordinate({ x: nextCenterPoint.x + x - width / 2, y: nextCenterPoint.y + y - height / 2 }, 11);
+  closeTo(after.latitude, before.latitude, 0.000001); closeTo(after.longitude, before.longitude, 0.000001);
+});
+
+test("visible map tiles use the allowlisted HTTPS tile origin", () => {
+  const tiles = visibleTiles({ latitude: 45.45, longitude: -122.84 }, 10, 800, 500); assert.ok(tiles.length > 4); assert.ok(tiles.every((tile) => tile.url.startsWith("https://tile.openstreetmap.org/10/")));
 });
 
 test("v2 import strips unknown candidate and envelope fields", () => {

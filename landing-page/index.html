@@ -6,7 +6,7 @@
   <meta name="description" content="A private-by-design family decision board for a 2027 move to Oregon's west and southwest Portland metro.">
   <meta name="theme-color" content="#173f35">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'none'; form-action 'none'">
   <meta property="og:title" content="The Oregon Move">
   <meta property="og:description" content="A map, four housing paths, two private local models, and one editable 2027 roadmap.">
   <title>The Oregon Move — family decision board</title>
@@ -101,25 +101,38 @@
 
     <section id="places" class="place-section" aria-labelledby="places-title">
       <div class="section-shell">
-        <div class="section-heading light"><div><span class="eyebrow">Area explorer</span><h2 id="places-title">Jobs, schools, water.<br><em>One honest map.</em></h2></div><p>This is a schematic orientation map—not navigation, commute proof, school assignment, flood mapping, or a property boundary. Select a job lens, then open live listing and official lookup links.</p></div>
+        <div class="section-heading light"><div><span class="eyebrow">Interactive area explorer</span><h2 id="places-title">Jobs, schools, water.<br><em>On a real map.</em></h2></div><p>Drag, zoom, select a place, and open the area or commute in Apple Maps. Roads and waterways come from OpenStreetMap; fit colors remain planning estimates—not navigation, school assignment, flood mapping, or property boundaries.</p></div>
         <div class="map-toolbar">
           <label for="commute-target">Commute lens <select id="commute-target"><option value="intel">Intel · Hillsboro</option><option value="nike">Nike · Beaverton</option><option value="lam">Lam · Tualatin</option><option value="portland">Portland professional services</option></select></label>
           <fieldset><legend>Map layers</legend><label><input type="checkbox" data-map-layer="jobs" checked> Jobs</label><label><input type="checkbox" data-map-layer="schools" checked> Districts</label><label><input type="checkbox" data-map-layer="water" checked> Water</label><label><input type="checkbox" data-map-layer="candidates" checked> My candidates</label></fieldset>
         </div>
         <div class="map-layout">
-          <div class="map-frame"><svg id="region-map" viewBox="0 0 500 520" role="img" aria-labelledby="map-title map-desc"><title id="map-title">Schematic west and southwest Portland move map</title><desc id="map-desc">Selectable area markers, verified employment anchors, district context, waterways, and approximate private candidate pins. A text area list follows.</desc><rect class="map-land" x="1" y="1" width="498" height="518" rx="18"></rect><g id="water-layer"></g><g id="school-layer"></g><g id="job-layer"></g><g id="area-layer"></g><g id="candidate-layer"></g></svg><p class="map-key"><span class="key-area">● area</span><span class="key-job">◆ job</span><span class="key-school">■ district</span><span class="key-candidate">★ saved candidate</span></p></div>
+          <div class="map-frame">
+            <div id="region-map" class="geo-map" tabindex="0" role="group" aria-label="Interactive west and southwest Portland map. Drag or use arrow keys to pan. Use plus and minus controls to zoom.">
+              <div id="map-tiles" class="map-tile-pane" aria-hidden="true"></div>
+              <div id="map-markers" class="map-marker-pane"></div>
+              <div class="map-controls" aria-label="Map controls"><button id="map-zoom-in" type="button" aria-label="Zoom in">+</button><button id="map-zoom-out" type="button" aria-label="Zoom out">−</button><button id="map-reset" type="button">Reset</button></div>
+              <div class="map-attribution"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a></div>
+            </div>
+            <p id="map-help" class="map-help">Drag to pan · scroll or use +/− to zoom · select numbered places · map tiles require a network connection.</p>
+            <p class="map-key"><span class="key-area">● area + commute fit</span><span class="key-job">◆ job anchor</span><span class="key-school">■ district context</span><span class="key-candidate">★ saved candidate</span></p>
+            <p class="map-privacy">Map tiles are loaded from OpenStreetMap, which receives ordinary network metadata and the viewed map extent. The planner never sends your private model or listing notes.</p>
+          </div>
           <aside id="area-detail" class="area-detail" aria-live="polite"><span class="card-kicker">Select an area</span><h3>Hillsboro / Orenco</h3><p>Use the map or area list to compare fit.</p></aside>
         </div>
         <div id="area-list" class="area-list"></div>
 
         <div class="candidate-board">
-          <div><span class="eyebrow">Local candidate notebook</span><h3>Save the contenders,<br><em>not street addresses.</em></h3><p>Use a neutral nickname and paste a listing link if useful. Nothing is fetched or uploaded. The link reveals its destination only when you choose to open it.</p></div>
+          <div><span class="eyebrow">Local candidate notebook</span><h3>Save the contenders,<br><em>not street addresses.</em></h3><p>Use a neutral nickname, paste a listing link, and optionally choose its point on the map. The listing is not fetched and your notebook is not uploaded. Links open only when you choose them.</p></div>
           <form id="candidate-form">
             <label>Nickname<input id="candidate-label" maxlength="120" required placeholder="House A or Newberg land"></label>
             <label>Area<select id="candidate-area" required></select></label>
             <label>Path<select id="candidate-path"><option value="ready-home">Move-in-ready</option><option value="fixer">Fixer</option><option value="land-build">Land + build</option><option value="rent-first">Rental</option></select></label>
             <label>Status<select id="candidate-status"><option value="watch">Watch</option><option value="visit">Plan a visit</option><option value="shortlist">Shortlist</option><option value="pass">Pass</option></select></label>
             <label>Price estimate<input id="candidate-price" type="number" min="0" max="100000000" step="1000" inputmode="numeric" placeholder="Optional"></label>
+            <label>Map latitude<input id="candidate-latitude" type="number" min="44" max="47.5" step="0.00001" inputmode="decimal" placeholder="Optional"></label>
+            <label>Map longitude<input id="candidate-longitude" type="number" min="-124.5" max="-121.5" step="0.00001" inputmode="decimal" placeholder="Optional"></label>
+            <button id="candidate-place-pin" class="button secondary pin-action" type="button" aria-pressed="false" disabled>Choose point on map</button>
             <label class="wide">Listing or parcel URL<input id="candidate-url" type="url" maxlength="2048" placeholder="https://…"></label>
             <label class="wide">Notes<textarea id="candidate-notes" maxlength="1000" rows="3" placeholder="Commute to verify, school lookup, dog yard, water or hazard questions…"></textarea></label>
             <button id="candidate-add" class="button primary" type="submit" disabled>Add to this model</button>

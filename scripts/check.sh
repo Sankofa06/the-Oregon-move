@@ -17,6 +17,7 @@ required=(
   landing-page/styles.css
   landing-page/overrides.css
   landing-page/app.mjs
+  landing-page/map.mjs
   landing-page/model.mjs
   landing-page/public-data.mjs
   scripts/model.test.mjs
@@ -28,6 +29,7 @@ for file in "${required[@]}"; do
 done
 
 node --check landing-page/app.mjs
+node --check landing-page/map.mjs
 node --check landing-page/model.mjs
 node --check landing-page/public-data.mjs
 node --test scripts/model.test.mjs
@@ -71,6 +73,7 @@ if search -n 'innerHTML|insertAdjacentHTML|document\.write' landing-page; then
 fi
 
 search -q "connect-src 'none'" landing-page/index.html
+search_fixed -q "img-src 'self' data: https://tile.openstreetmap.org" landing-page/index.html
 search -q 'Save this model on this device' landing-page/index.html
 search -q 'Browser storage is not a vault' landing-page/index.html
 search -q 'Illustrative example' landing-page/index.html
@@ -78,6 +81,10 @@ search -q 'View source on GitHub' landing-page/index.html
 search -q 'My model' landing-page/index.html
 search -q 'Partner model' landing-page/index.html
 search -q 'region-map' landing-page/index.html
+search -q 'map-tiles' landing-page/index.html
+search -q 'Open in Apple Maps' landing-page/app.mjs
+search_fixed -q 'https://tile.openstreetmap.org/' landing-page/map.mjs
+search -q '© OpenStreetMap contributors' landing-page/index.html
 search -q 'candidate-form' landing-page/index.html
 search -q 'Editable 12-month Gantt' landing-page/index.html
 search_fixed -q 'oregonMove.workspace.v2.${slot}' landing-page/model.mjs

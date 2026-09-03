@@ -252,91 +252,250 @@
 }
 
 #region-map {
-  display: block;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   width: 100%;
-  height: auto;
-  max-height: 620px;
+  height: clamp(460px, 57vw, 620px);
+  border: 1px solid #9fb6a3;
+  background: #e9eee7;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
 
-.map-land {
-  fill: #eef2e9;
-  stroke: #9fb6a3;
-  stroke-width: 2;
+#region-map:active {
+  cursor: grabbing;
 }
 
-.waterway {
-  fill: none;
-  stroke: #5992a6;
-  stroke-width: 8;
-  stroke-linecap: round;
-  opacity: .72;
+#region-map:focus-visible {
+  outline: 4px solid #f3c465;
+  outline-offset: 3px;
 }
 
-.area-pin {
-  cursor: pointer;
+.map-tile-pane,
+.map-marker-pane {
+  position: absolute;
+  inset: 0;
 }
 
-.area-pin circle {
-  fill: var(--white);
-  stroke: var(--deep);
-  stroke-width: 2;
+.map-tile-pane {
+  z-index: 1;
+  overflow: hidden;
 }
 
-.area-pin text {
-  fill: var(--deep);
-  font: 800 10px var(--sans);
+.map-tile {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  max-width: none;
+  border: 0;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.map-marker-pane {
+  z-index: 2;
   pointer-events: none;
 }
 
-.area-pin.fit-strong circle {
-  fill: #9dcf92;
+.geo-marker {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--deep);
+  font: 800 .68rem var(--sans);
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
 }
 
-.area-pin.fit-workable circle {
-  fill: #f1cc72;
+.geo-marker button,
+button.geo-marker {
+  cursor: pointer;
 }
 
-.area-pin.fit-variable circle {
-  fill: #e9a168;
+.marker-symbol {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(14, 48, 41, .35);
 }
 
-.area-pin.fit-stretched circle {
-  fill: #d98a80;
+.marker-label {
+  position: relative;
+  z-index: 1;
+  display: none;
+  max-width: 175px;
+  margin-left: -4px;
+  padding: .38rem .55rem .38rem .68rem;
+  border: 1px solid rgba(14, 48, 41, .25);
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 2px 10px rgba(14, 48, 41, .22);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.area-pin.is-selected circle {
-  stroke: #0b241f;
-  stroke-width: 5;
+.geo-marker:hover .marker-label,
+.geo-marker:focus-visible .marker-label,
+.geo-marker.is-selected .marker-label {
+  display: block;
 }
 
-.area-pin:focus circle {
-  stroke: #a94731;
-  stroke-width: 6;
+.area-marker.fit-strong .marker-symbol { background: #9dcf92; }
+.area-marker.fit-workable .marker-symbol { background: #f1cc72; }
+.area-marker.fit-variable .marker-symbol { background: #e9a168; }
+.area-marker.fit-stretched .marker-symbol { background: #d98a80; }
+
+.area-marker.is-selected .marker-symbol {
+  border-color: #f3c465;
+  box-shadow: 0 0 0 4px var(--deep), 0 3px 12px rgba(14, 48, 41, .4);
 }
 
-.job-pin polygon {
-  fill: #a94731;
-  stroke: var(--white);
-  stroke-width: 2;
+.geo-marker:focus-visible .marker-symbol {
+  outline: 4px solid #a94731;
+  outline-offset: 3px;
 }
 
-.job-pin text {
-  fill: var(--deep);
-  font: 800 11px var(--sans);
+.job-marker {
+  z-index: 4;
 }
 
-.school-pin {
-  fill: #5d689b;
-  stroke: var(--white);
-  stroke-width: 1.5;
+.job-marker .marker-symbol {
+  width: 27px;
+  height: 27px;
+  border-radius: 4px;
+  background: #a94731;
+  color: #fff;
+  transform: rotate(45deg);
 }
 
-.candidate-pin text {
-  fill: #b96e00;
-  stroke: var(--white);
-  stroke-width: 1.5;
-  paint-order: stroke;
-  font: 800 22px var(--sans);
+.job-marker .marker-symbol span {
+  transform: rotate(-45deg);
+}
+
+.school-marker,
+.water-marker {
+  z-index: 1;
+  gap: .3rem;
+  color: #354072;
+  pointer-events: none;
+}
+
+.school-marker .marker-symbol {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+  border-radius: 3px;
+  background: #5d689b;
+}
+
+.water-marker {
+  color: #315f76;
+  font-size: .6rem;
+}
+
+.water-marker .marker-symbol {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+  background: #5992a6;
+}
+
+.water-marker .marker-label {
+  display: block;
+  padding: .2rem .35rem;
+  border-color: rgba(49, 95, 118, .25);
+  background: rgba(239, 248, 250, .88);
+}
+
+.candidate-marker,
+.draft-marker {
+  z-index: 5;
+}
+
+.candidate-marker .marker-symbol,
+.draft-marker .marker-symbol {
+  width: 36px;
+  height: 36px;
+  border-color: #fff;
+  background: #f3c465;
+  color: #6e4300;
+  font-size: 1.25rem;
+}
+
+.draft-marker .marker-symbol {
+  border-style: dashed;
+  background: #fff;
+}
+
+.map-controls {
+  position: absolute;
+  z-index: 10;
+  top: .75rem;
+  left: .75rem;
+  display: grid;
+  grid-template-columns: 44px 44px auto;
+  box-shadow: 0 3px 14px rgba(14, 48, 41, .3);
+}
+
+.map-controls button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 .65rem;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: rgba(255,255,255,.96);
+  color: var(--deep);
+  font-weight: 850;
+}
+
+.map-controls button:last-child { border-right: 0; }
+.map-controls button:hover { background: #f3c465; }
+
+.map-attribution {
+  position: absolute;
+  z-index: 10;
+  right: 0;
+  bottom: 0;
+  padding: .25rem .4rem;
+  background: rgba(255,255,255,.9);
+  font-size: .58rem;
+}
+
+.map-attribution a { color: #233e60; }
+
+.geo-map.is-placing {
+  cursor: crosshair;
+  box-shadow: inset 0 0 0 5px #f3c465;
+}
+
+.map-help,
+.map-privacy {
+  margin: .65rem 0 0;
+  color: #34534b;
+  font-size: .68rem;
+}
+
+.map-privacy {
+  max-width: 78ch;
+  font-size: .62rem;
+}
+
+.pin-action {
+  align-self: end;
+  min-height: 44px;
 }
 
 .map-key {
@@ -669,6 +828,9 @@ body.private-plan.hide-values textarea {
 }
 
 @media (max-width: 700px) {
+  #region-map { height: 440px; }
+  .marker-label { max-width: 130px; }
+  .map-controls { top: .5rem; left: .5rem; }
   .workspace-panel { grid-template-columns: 1fr; }
   .workspace-switch { display: grid; grid-template-columns: 1fr; }
   .workspace-switch label { width: 100%; }

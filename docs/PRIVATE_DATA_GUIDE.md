@@ -43,7 +43,9 @@ The planner's three sale cases deliberately pair the lower sale estimate with th
 
 ## Oregon housing packet
 
-For every live option, record a neutral nickname, link, asking price or rent, housing path, area, and brief notes in the candidate notebook. Before treating it as viable, verify the exact address's property tax, insurance, school assignment, commute at likely work times, pet rules, condition, utilities, hazards, fees, and closing or move-in timing.
+For every live option, record a neutral nickname, link, asking price or rent, housing path, area, and brief notes in the candidate notebook. You may also click the map to save an exact candidate point; the coordinate remains in that browser-local model and its exports. Before treating an option as viable, verify the exact address's property tax, insurance, school assignment, commute at likely work times, pet rules, condition, utilities, hazards, fees, and closing or move-in timing.
+
+The geographic basemap loads visible tiles from OpenStreetMap. That request exposes ordinary network metadata and the viewed map extent to the tile provider, but the site does not send the private model, candidate notes, saved coordinates, or listing URLs. Do not use the map for a confidential household address; use neutral candidate points and the official parcel tools only when you are ready for property-specific diligence.
 
 Land/build also requires written evidence for zoning and overlays, legal access, wetlands/flood/slope, utilities, well/septic, survey/geotechnical work, jurisdiction fees, builder bids, construction financing, carrying costs, and a rent-first fallback.
 

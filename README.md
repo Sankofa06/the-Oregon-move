@@ -4,7 +4,7 @@ A private-by-design decision board for planning a family move to the west side o
 
 The GitHub Pages site brings together:
 
-- a schematic area map with job anchors, waterways, schools, hazards, and live Zillow/Redfin searches;
+- a real pan-and-zoom geographic map with job anchors, water and district context, Apple Maps launch/directions links, live Zillow/Redfin searches, and optional exact candidate pins;
 - editable sale-proceeds, debt-paydown, affordability, and four-path housing models;
 - separate **My model** and **Partner model** browser workspaces;
 - a local-only candidate notebook for listings and research links; and

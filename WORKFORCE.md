@@ -1,5 +1,15 @@
 # Oregon Move Workforce Record
 
+## V2.1 interactive-map amendment — September 2, 2026
+
+- User correction: the schematic did not meet the expected Apple Maps-like experience.
+- Outcome: replace it with a real geographic slippy map that supports drag, wheel/button/keyboard zoom, selectable areas and job anchors, water and district context, optional exact candidate points, and Apple Maps place/directions links.
+- Privacy boundary: no geocoder, location permission, analytics, or private-model request. Visible raster tiles load from OpenStreetMap and therefore disclose ordinary network metadata and the viewed extent; the UI and private-data guide state that boundary.
+- Provider policy: normal interactive tile viewing only, with persistent attribution, browser caching, no prefetch, and no offline download.
+- State: VERIFIED LOCALLY; publication and exact Pages verification pending.
+- DEC-108: this amendment supersedes DEC-103's schematic-only presentation while retaining local code, no remote scripts, `connect-src 'none'`, and no private input egress.
+- Local evidence: 23/23 deterministic tests; 12 area markers and four job anchors; OSM tiles loaded at 256px; button zoom changed from level 10 to 11; keyboard and pointer panning moved the tile plane; Beaverton selection updated the detail panel; a synthetic private candidate point produced a local marker and Apple Maps link; 1280px and 390px layouts had no page overflow; no browser warnings or errors.
+
 ## V2 commission — September 2, 2026
 
 - Outcome and audience: turn the delivered planning page into a private-working tool for the couple while preserving the reality that the GitHub Pages URL and tracked repository are public.

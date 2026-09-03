@@ -301,6 +301,13 @@ function assertCandidate(candidate, index, seenIds) {
     if (!["http:", "https:"].includes(parsed.protocol)) throw new TypeError(`Candidate ${index + 1} link must use HTTP or HTTPS.`);
   }
   if (typeof candidate.notes !== "string" || candidate.notes.length > 1000) throw new TypeError(`Candidate ${index + 1} notes are invalid.`);
+  const hasLatitude = candidate.latitude !== null;
+  const hasLongitude = candidate.longitude !== null;
+  if (hasLatitude !== hasLongitude) throw new RangeError(`Candidate ${index + 1} map point needs both latitude and longitude.`);
+  if (hasLatitude) {
+    assertNumber(candidate.latitude, `Candidate ${index + 1} latitude`, { min: 44, max: 47.5 });
+    assertNumber(candidate.longitude, `Candidate ${index + 1} longitude`, { min: -124.5, max: -121.5 });
+  }
 }
 
 function validateOrdered(values, label) {
@@ -372,7 +379,7 @@ export function sanitizeImportedEnvelope(raw, template, byteLength = null) {
   safe.plan.career.targetRoles = Array.isArray(raw.plan?.career?.targetRoles) ? raw.plan.career.targetRoles.map((item) => item) : [];
   const taskTemplate = template.plan.roadmap[0];
   safe.plan.roadmap = Array.isArray(raw.plan?.roadmap) ? raw.plan.roadmap.map((task) => allowlist(task, taskTemplate)) : [];
-  const candidateTemplate = template.plan.candidates[0] || { id: "candidate", label: "Candidate", areaKey: "hillsboro", housingPath: "ready-home", status: "watch", priceUsd: null, url: "", notes: "" };
+  const candidateTemplate = template.plan.candidates[0] || { id: "candidate", label: "Candidate", areaKey: "hillsboro", housingPath: "ready-home", status: "watch", priceUsd: null, url: "", notes: "", latitude: null, longitude: null };
   safe.plan.candidates = sourceMajor === "2" && Array.isArray(raw.plan?.candidates) ? raw.plan.candidates.map((candidate) => allowlist(candidate, candidateTemplate)) : [];
   if (sourceMajor === "1") {
     safe.plan.career.primaryGrossAnnualUsd = null; safe.plan.career.partnerGrossAnnualUsd = null;

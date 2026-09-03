@@ -56,7 +56,7 @@ The highest-uncertainty path and likely a two-stage move. Model land, access, ut
 
 ## Area exploration
 
-The map is a screening tool, not a route engine. Its commute labels are qualitative geographic inferences; actual traffic, shift time, and campus can change the answer.
+The map is a real geographic pan-and-zoom view backed by OpenStreetMap tiles, but it remains a screening tool rather than a route engine. Its commute labels are qualitative geographic inferences; actual traffic, shift time, and campus can change the answer. Open the selected area or area-to-employer directions in Apple Maps to examine the road network, then test finalist trips at the actual shift time.
 
 - **Intel-first:** Hillsboro/Orenco and North Plains; Forest Grove trades commute resilience for more space and Coast Range character.
 - **Two-career compromise:** Beaverton and Cedar Mill/Bethany offer useful access to Nike, Intel, and Portland professional-services work.

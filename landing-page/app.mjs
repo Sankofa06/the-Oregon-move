@@ -11,7 +11,20 @@ import {
   validateEnvelope,
   workspaceStorageKey,
 } from "./model.mjs";
-import { areaProfiles, blankPrivateEnvelope, exampleEnvelope, jobAnchors, sources, waterways } from "./public-data.mjs";
+import {
+  DEFAULT_MAP_VIEW,
+  MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
+  candidateCoordinateIsValid,
+  centerAfterPan,
+  centerAfterZoom,
+  clampMapCenter,
+  clampZoom,
+  coordinateAtScreenPoint,
+  screenPosition,
+  visibleTiles,
+} from "./map.mjs";
+import { areaProfiles, blankPrivateEnvelope, exampleEnvelope, jobAnchors, sources, waterPlaces } from "./public-data.mjs";
 
 const LEGACY_STORAGE_KEY = "oregonMove.plan.v1";
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -25,6 +38,8 @@ const workspaceNames = { mine: "My model", partner: "Partner model" };
 const workspaceStates = { example: { envelope: clone(exampleEnvelope), dirty: false, saveTimer: null, conflictEnvelope: null, loadedMessage: "Illustrative example · nothing has been stored." }, mine: null, partner: null };
 let activeWorkspace = "example";
 let selectedAreaKey = "hillsboro";
+let placingCandidatePin = false;
+const mapRuntime = { initialized: false, center: { latitude: DEFAULT_MAP_VIEW.latitude, longitude: DEFAULT_MAP_VIEW.longitude }, zoom: DEFAULT_MAP_VIEW.zoom, tiles: new Map(), drag: null, suppressClick: false, frame: null };
 
 const fieldGroups = {
   shared: [
@@ -126,11 +141,13 @@ function loadWorkspace(slot) {
 
 function switchWorkspace(slot) {
   if (!["example", "mine", "partner"].includes(slot)) return;
+  byId("candidate-form").reset(); setPinPlacement(false);
   activeWorkspace = slot;
   if (slot !== "example") loadWorkspace(slot);
   document.querySelectorAll('input[name="workspace"]').forEach((radio) => { radio.checked = radio.value === slot; });
   byId("conflict").hidden = !state().conflictEnvelope;
   render();
+  byId("candidate-area").value = selectedAreaKey;
   announce(state().loadedMessage);
 }
 
@@ -201,7 +218,8 @@ function renderStatus() {
   document.body.classList.toggle("private-plan", isPrivate()); document.body.classList.toggle("hide-values", plan.preferences.hideValues);
   byId("hide-values").disabled = !isPrivate(); byId("hide-values").checked = plan.preferences.hideValues;
   byId("save-device").disabled = !isPrivate(); byId("save-device").checked = isPrivate() && plan.preferences.saveOnDevice;
-  byId("export-plan").disabled = !isPrivate(); byId("import-trigger").disabled = !isPrivate(); byId("clear-plan").disabled = !isPrivate(); byId("reset-roadmap").disabled = !isPrivate(); byId("candidate-add").disabled = !isPrivate();
+  byId("export-plan").disabled = !isPrivate(); byId("import-trigger").disabled = !isPrivate(); byId("clear-plan").disabled = !isPrivate(); byId("reset-roadmap").disabled = !isPrivate(); byId("candidate-add").disabled = !isPrivate(); byId("candidate-place-pin").disabled = !isPrivate();
+  if (!isPrivate() && placingCandidatePin) setPinPlacement(false);
   document.querySelectorAll("#candidate-form input, #candidate-form select, #candidate-form textarea").forEach((input) => { input.disabled = !isPrivate(); });
   document.querySelectorAll("[data-focus]").forEach((button) => { const selected = plan.selectedFocus === button.dataset.focus; button.disabled = !isPrivate(); button.setAttribute("aria-pressed", String(selected)); button.textContent = selected ? "Current focus" : "Set as focus"; button.closest(".scenario-card").classList.toggle("is-focus", selected); });
 }
@@ -213,31 +231,148 @@ function createSvg(name, attributes = {}) {
 function layerEnabled(name) { return document.querySelector(`[data-map-layer="${name}"]`)?.checked ?? true; }
 function fitLabel(value) { return ({ strong: "Strong fit", workable: "Workable", variable: "Traffic-sensitive", stretched: "Often over target" })[value]; }
 
-function selectArea(key) { selectedAreaKey = key; renderMap(); renderAreaDetail(); renderAreaList(); }
-
-function renderMap() {
-  const plan = state().envelope.plan; const lens = byId("commute-target").value;
-  const waterLayer = byId("water-layer"); const schoolLayer = byId("school-layer"); const jobLayer = byId("job-layer"); const areaLayer = byId("area-layer"); const candidateLayer = byId("candidate-layer");
-  [waterLayer, schoolLayer, jobLayer, areaLayer, candidateLayer].forEach((node) => node.replaceChildren());
-  if (layerEnabled("water")) waterways.forEach((river) => { const line = createSvg("polyline", { points: river.points, class: "waterway" }); const title = createSvg("title"); title.textContent = river.name; line.append(title); waterLayer.append(line); });
-  areaProfiles.forEach((area, index) => {
-    const group = createSvg("g", { class: `area-pin fit-${area.fit[lens]}${selectedAreaKey === area.key ? " is-selected" : ""}`, tabindex: "0", role: "button", "aria-label": `${area.name}; ${fitLabel(area.fit[lens])} for selected commute lens`, "aria-pressed": String(selectedAreaKey === area.key), transform: `translate(${area.x} ${area.y})` });
-    group.dataset.areaKey = area.key; const circle = createSvg("circle", { r: "12" }); const number = createSvg("text", { x: "0", y: "4", "text-anchor": "middle" }); number.textContent = String(index + 1); group.append(circle, number); areaLayer.append(group);
-    if (layerEnabled("schools")) { const marker = createSvg("rect", { class: "school-pin", x: area.x + 13, y: area.y - 20, width: "8", height: "8", rx: "1" }); const title = createSvg("title"); title.textContent = `${area.school} lookup context`; marker.append(title); schoolLayer.append(marker); }
-  });
-  if (layerEnabled("jobs")) jobAnchors.forEach((job) => { const group = createSvg("g", { class: "job-pin", transform: `translate(${job.x} ${job.y})` }); const diamond = createSvg("polygon", { points: "0,-9 9,0 0,9 -9,0" }); const title = createSvg("title"); title.textContent = `${job.name}. ${job.note}`; diamond.append(title); const label = createSvg("text", { x: "12", y: "4" }); label.textContent = job.name.split(" · ")[0]; group.append(diamond, label); jobLayer.append(group); });
-  if (layerEnabled("candidates")) plan.candidates.forEach((candidate, index) => { const area = areaProfiles.find((item) => item.key === candidate.areaKey); if (!area) return; const offsetX = 18 + ((index % 3) * 11); const offsetY = 8 + ((index % 2) * 12); const group = createSvg("g", { class: "candidate-pin", transform: `translate(${area.x + offsetX} ${area.y + offsetY})` }); const star = createSvg("text", { x: "0", y: "0" }); star.textContent = "★"; const title = createSvg("title"); title.textContent = `${candidate.label}; approximate ${area.name} area pin`; star.append(title); group.append(star); candidateLayer.append(group); });
-  areaLayer.querySelectorAll("[data-area-key]").forEach((pin) => { pin.addEventListener("click", () => selectArea(pin.dataset.areaKey)); pin.addEventListener("keydown", (event) => { if (["Enter", " "].includes(event.key)) { event.preventDefault(); selectArea(pin.dataset.areaKey); } }); });
+function mapDimensions() {
+  const bounds = byId("region-map").getBoundingClientRect();
+  return { width: Math.max(1, bounds.width), height: Math.max(1, bounds.height) };
 }
 
+function requestMapPaint() {
+  if (mapRuntime.frame !== null) return;
+  mapRuntime.frame = requestAnimationFrame(() => { mapRuntime.frame = null; paintMap(); });
+}
+
+function setMapView(coordinate, zoom = mapRuntime.zoom) {
+  mapRuntime.center = clampMapCenter(coordinate);
+  mapRuntime.zoom = clampZoom(zoom);
+  requestMapPaint();
+}
+
+function zoomMap(delta, anchorX, anchorY) {
+  const { width, height } = mapDimensions();
+  const nextZoom = clampZoom(mapRuntime.zoom + delta);
+  if (nextZoom === mapRuntime.zoom) return;
+  const x = Number.isFinite(anchorX) ? anchorX : width / 2;
+  const y = Number.isFinite(anchorY) ? anchorY : height / 2;
+  mapRuntime.center = centerAfterZoom(mapRuntime.center, mapRuntime.zoom, nextZoom, width, height, x, y);
+  mapRuntime.zoom = nextZoom;
+  requestMapPaint();
+}
+
+function resetMapView() { setMapView(DEFAULT_MAP_VIEW, DEFAULT_MAP_VIEW.zoom); }
+
+function setPinPlacement(enabled) {
+  placingCandidatePin = Boolean(enabled && isPrivate());
+  const button = byId("candidate-place-pin"); const map = byId("region-map"); const help = byId("map-help");
+  button?.setAttribute("aria-pressed", String(placingCandidatePin));
+  if (button) button.textContent = placingCandidatePin ? "Cancel map point" : "Choose point on map";
+  map?.classList.toggle("is-placing", placingCandidatePin);
+  if (help) help.textContent = placingCandidatePin ? "Choose a location on the map. Nothing is geocoded or uploaded; the coordinates stay in this model." : "Drag to pan · scroll or use +/− to zoom · select numbered places · map tiles require a network connection.";
+}
+
+function selectArea(key, moveMap = true) {
+  selectedAreaKey = key;
+  const area = areaProfiles.find((item) => item.key === key);
+  if (moveMap && area) setMapView(area, Math.max(mapRuntime.zoom, 11));
+  renderMap(); renderAreaDetail(); renderAreaList();
+}
+
+function positionMarker(element, coordinate, offsetX = 0, offsetY = 0) {
+  const { width, height } = mapDimensions();
+  const point = screenPosition(coordinate, mapRuntime.center, mapRuntime.zoom, width, height);
+  element.style.left = `${point.x + offsetX}px`; element.style.top = `${point.y + offsetY}px`;
+}
+
+function addMapMarker({ className, coordinate, symbol, label, interactive = false, selected = false, offsetX = 0, offsetY = 0, onClick }) {
+  const element = document.createElement(interactive ? "button" : "div");
+  if (interactive) element.type = "button"; else element.setAttribute("aria-hidden", "true");
+  element.className = `geo-marker ${className}${selected ? " is-selected" : ""}`;
+  if (interactive) element.setAttribute("aria-label", label);
+  const symbolNode = document.createElement("span"); symbolNode.className = "marker-symbol";
+  if (className.includes("job-marker")) { const inner = document.createElement("span"); inner.textContent = symbol; symbolNode.append(inner); } else symbolNode.textContent = symbol;
+  const labelNode = document.createElement("span"); labelNode.className = "marker-label"; labelNode.textContent = label;
+  element.append(symbolNode, labelNode); positionMarker(element, coordinate, offsetX, offsetY);
+  if (onClick) element.addEventListener("click", onClick);
+  byId("map-markers").append(element);
+  return element;
+}
+
+function paintTiles() {
+  const { width, height } = mapDimensions();
+  const required = new Set();
+  visibleTiles(mapRuntime.center, mapRuntime.zoom, width, height).forEach((tile) => {
+    required.add(tile.key); let image = mapRuntime.tiles.get(tile.key);
+    if (!image) { image = document.createElement("img"); image.className = "map-tile"; image.alt = ""; image.decoding = "async"; image.draggable = false; image.src = tile.url; image.dataset.tileKey = tile.key; mapRuntime.tiles.set(tile.key, image); byId("map-tiles").append(image); }
+    image.style.transform = `translate3d(${Math.round(tile.x)}px, ${Math.round(tile.y)}px, 0)`;
+  });
+  for (const [key, image] of mapRuntime.tiles) { if (!required.has(key)) { image.remove(); mapRuntime.tiles.delete(key); } }
+}
+
+function candidateFormCoordinate() {
+  const latitudeInput = byId("candidate-latitude"); const longitudeInput = byId("candidate-longitude");
+  if (!latitudeInput?.value || !longitudeInput?.value) return null;
+  const latitude = Number(latitudeInput.value); const longitude = Number(longitudeInput.value);
+  return candidateCoordinateIsValid(latitude, longitude) ? { latitude, longitude } : null;
+}
+
+function paintMarkers() {
+  const plan = state().envelope.plan; const lens = byId("commute-target").value; const markerPane = byId("map-markers"); markerPane.replaceChildren();
+  areaProfiles.forEach((area, index) => {
+    addMapMarker({ className: `area-marker fit-${area.fit[lens]}`, coordinate: area, symbol: String(index + 1), label: `${area.name} · ${fitLabel(area.fit[lens])}`, interactive: true, selected: selectedAreaKey === area.key, onClick: () => selectArea(area.key, false) });
+    if (layerEnabled("schools")) addMapMarker({ className: "school-marker", coordinate: area, symbol: "", label: `${area.school} context`, offsetX: 18, offsetY: -20 });
+  });
+  if (layerEnabled("jobs")) jobAnchors.forEach((job) => addMapMarker({ className: "job-marker", coordinate: job, symbol: job.name.slice(0, 1), label: job.name, interactive: true, selected: lens === job.key, onClick: () => { byId("commute-target").value = job.key; renderMap(); renderAreaDetail(); renderAreaList(); } }));
+  if (layerEnabled("water")) waterPlaces.forEach((water) => addMapMarker({ className: "water-marker", coordinate: water, symbol: "", label: water.name }));
+  if (layerEnabled("candidates")) plan.candidates.forEach((candidate, index) => {
+    const area = areaProfiles.find((item) => item.key === candidate.areaKey); if (!area) return;
+    const exact = candidateCoordinateIsValid(candidate.latitude, candidate.longitude); const coordinate = exact ? candidate : area;
+    addMapMarker({ className: "candidate-marker", coordinate, symbol: "★", label: `${candidate.label} · ${exact ? "saved map point" : `approximate ${area.name} point`}`, interactive: true, offsetX: exact ? 0 : 20 + ((index % 3) * 12), offsetY: exact ? 0 : 18 + ((index % 2) * 12), onClick: () => selectArea(candidate.areaKey, false) });
+  });
+  const draft = candidateFormCoordinate();
+  if (isPrivate() && draft) addMapMarker({ className: "draft-marker", coordinate: draft, symbol: "+", label: "Candidate point ready to save" });
+}
+
+function paintMap() { if (!mapRuntime.initialized) return; paintTiles(); paintMarkers(); }
+
+function initializeMap() {
+  if (mapRuntime.initialized) return;
+  const map = byId("region-map"); mapRuntime.initialized = true;
+  map.addEventListener("pointerdown", (event) => { if (event.target.closest("button, a")) return; mapRuntime.drag = { id: event.pointerId, x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY }; map.setPointerCapture(event.pointerId); });
+  map.addEventListener("pointermove", (event) => { const drag = mapRuntime.drag; if (!drag || drag.id !== event.pointerId) return; const deltaX = event.clientX - drag.x; const deltaY = event.clientY - drag.y; drag.x = event.clientX; drag.y = event.clientY; mapRuntime.center = centerAfterPan(mapRuntime.center, mapRuntime.zoom, deltaX, deltaY); requestMapPaint(); });
+  const endDrag = (event) => { const drag = mapRuntime.drag; if (!drag || drag.id !== event.pointerId) return; mapRuntime.suppressClick = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 5; mapRuntime.drag = null; if (map.hasPointerCapture(event.pointerId)) map.releasePointerCapture(event.pointerId); };
+  map.addEventListener("pointerup", endDrag); map.addEventListener("pointercancel", endDrag);
+  map.addEventListener("click", (event) => {
+    if (mapRuntime.suppressClick) { mapRuntime.suppressClick = false; return; }
+    if (!placingCandidatePin || event.target.closest("button, a")) return;
+    const bounds = map.getBoundingClientRect(); const coordinate = coordinateAtScreenPoint(mapRuntime.center, mapRuntime.zoom, bounds.width, bounds.height, event.clientX - bounds.left, event.clientY - bounds.top);
+    if (!candidateCoordinateIsValid(coordinate.latitude, coordinate.longitude)) { announce("Choose a point within the Oregon–southwest Washington planning region."); return; }
+    byId("candidate-latitude").value = coordinate.latitude.toFixed(5); byId("candidate-longitude").value = coordinate.longitude.toFixed(5); setPinPlacement(false); renderMap(); announce("Candidate map point set in this local model. Add the candidate when ready.");
+  });
+  map.addEventListener("wheel", (event) => { event.preventDefault(); const bounds = map.getBoundingClientRect(); zoomMap(event.deltaY < 0 ? 1 : -1, event.clientX - bounds.left, event.clientY - bounds.top); }, { passive: false });
+  map.addEventListener("dblclick", (event) => { if (placingCandidatePin) return; event.preventDefault(); const bounds = map.getBoundingClientRect(); zoomMap(1, event.clientX - bounds.left, event.clientY - bounds.top); });
+  map.addEventListener("keydown", (event) => {
+    const keyPan = { ArrowLeft: [80, 0], ArrowRight: [-80, 0], ArrowUp: [0, 80], ArrowDown: [0, -80] }[event.key];
+    if (keyPan) { event.preventDefault(); mapRuntime.center = centerAfterPan(mapRuntime.center, mapRuntime.zoom, keyPan[0], keyPan[1]); requestMapPaint(); }
+    if (["+", "="].includes(event.key)) { event.preventDefault(); zoomMap(1); }
+    if (["-", "_"].includes(event.key)) { event.preventDefault(); zoomMap(-1); }
+    if (["0", "Home"].includes(event.key)) { event.preventDefault(); resetMapView(); }
+  });
+  byId("map-zoom-in").addEventListener("click", () => zoomMap(1)); byId("map-zoom-out").addEventListener("click", () => zoomMap(-1)); byId("map-reset").addEventListener("click", resetMapView);
+  new ResizeObserver(requestMapPaint).observe(map);
+}
+
+function renderMap() { initializeMap(); requestMapPaint(); }
+
 function appendExternalLink(parent, href, text) { const link = document.createElement("a"); link.href = href; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = text; parent.append(link); }
+
+function appleMapsPlaceUrl(place) { return `https://maps.apple.com/?ll=${place.latitude},${place.longitude}&q=${encodeURIComponent(place.name)}`; }
+function appleMapsDirectionsUrl(origin, destination) { return `https://maps.apple.com/?saddr=${origin.latitude},${origin.longitude}&daddr=${destination.latitude},${destination.longitude}&dirflg=d`; }
 
 function renderAreaDetail() {
   const area = areaProfiles.find((item) => item.key === selectedAreaKey) || areaProfiles[0]; const lens = byId("commute-target").value; const job = jobAnchors.find((item) => item.key === lens);
   const panel = byId("area-detail"); panel.replaceChildren(); const kicker = document.createElement("span"); kicker.className = "card-kicker"; kicker.textContent = `${fitLabel(area.fit[lens])} for ${job.name}`;
   const heading = document.createElement("h3"); heading.textContent = area.name; const market = document.createElement("p"); market.className = "market-line"; market.textContent = area.market;
   const summary = document.createElement("p"); summary.textContent = area.summary; const water = document.createElement("p"); water.textContent = area.water;
-  const links = document.createElement("div"); links.className = "detail-links"; appendExternalLink(links, area.redfin, "Redfin ≤ $700k ↗"); appendExternalLink(links, area.zillow, "Zillow search ↗"); appendExternalLink(links, area.schoolUrl, `${area.school} lookup ↗`);
+  const links = document.createElement("div"); links.className = "detail-links"; appendExternalLink(links, appleMapsPlaceUrl(area), "Open in Apple Maps ↗"); appendExternalLink(links, appleMapsDirectionsUrl(area, job), `Drive to ${job.name.split(" · ")[0]} ↗`); appendExternalLink(links, area.redfin, "Redfin ≤ $700k ↗"); appendExternalLink(links, area.zillow, "Zillow search ↗"); appendExternalLink(links, area.schoolUrl, `${area.school} lookup ↗`);
   panel.append(kicker, heading, market, summary, water, links);
 }
 
@@ -265,7 +400,9 @@ function renderCandidates() {
     const notes = document.createElement("textarea"); notes.rows = 3; notes.maxLength = 1000; notes.value = candidate.notes;
     [[labelInput, "label"], [areaSelect, "areaKey"], [pathSelect, "housingPath"], [statusSelect, "status"], [price, "priceUsd"], [url, "url"], [notes, "notes"]].forEach(([control, field]) => { control.dataset.candidateId = candidate.id; control.dataset.candidateField = field; control.disabled = !isPrivate(); });
     const grid = document.createElement("div"); grid.className = "candidate-edit-grid"; grid.append(candidateField("Nickname", labelInput), candidateField("Area", areaSelect), candidateField("Path", pathSelect), candidateField("Status", statusSelect), candidateField("Price", price), candidateField("Listing link", url), candidateField("Notes", notes));
-    const actions = document.createElement("div"); actions.className = "candidate-actions"; if (candidate.url) appendExternalLink(actions, candidate.url, "Open listing ↗"); const remove = document.createElement("button"); remove.type = "button"; remove.className = "button danger"; remove.dataset.removeCandidate = candidate.id; remove.disabled = !isPrivate(); remove.textContent = "Remove"; actions.append(remove); card.append(grid, actions); list.append(card);
+    const actions = document.createElement("div"); actions.className = "candidate-actions"; if (candidate.url) appendExternalLink(actions, candidate.url, "Open listing ↗");
+    if (candidateCoordinateIsValid(candidate.latitude, candidate.longitude)) { const mapLink = { name: candidate.label, latitude: candidate.latitude, longitude: candidate.longitude }; appendExternalLink(actions, appleMapsPlaceUrl(mapLink), "Open map point ↗"); const clearPoint = document.createElement("button"); clearPoint.type = "button"; clearPoint.className = "button secondary"; clearPoint.dataset.clearCandidatePoint = candidate.id; clearPoint.disabled = !isPrivate(); clearPoint.textContent = "Clear map point"; actions.append(clearPoint); }
+    const remove = document.createElement("button"); remove.type = "button"; remove.className = "button danger"; remove.dataset.removeCandidate = candidate.id; remove.disabled = !isPrivate(); remove.textContent = "Remove"; actions.append(remove); card.append(grid, actions); list.append(card);
   });
 }
 
@@ -346,20 +483,28 @@ byId("save-device").addEventListener("change", (event) => {
 document.querySelectorAll("[data-focus]").forEach((button) => button.addEventListener("click", () => { if (!isPrivate()) return; state().envelope.plan.selectedFocus = state().envelope.plan.selectedFocus === button.dataset.focus ? null : button.dataset.focus; scheduleSave(); renderStatus(); }));
 byId("commute-target").addEventListener("change", () => { renderMap(); renderAreaDetail(); renderAreaList(); });
 document.querySelectorAll("[data-map-layer]").forEach((checkbox) => checkbox.addEventListener("change", renderMap));
+byId("candidate-place-pin").addEventListener("click", () => { if (isPrivate()) setPinPlacement(!placingCandidatePin); });
+[byId("candidate-latitude"), byId("candidate-longitude")].forEach((input) => input.addEventListener("input", renderMap));
 
 byId("candidate-form").addEventListener("submit", (event) => {
   event.preventDefault(); if (!isPrivate()) return;
-  const candidate = { id: globalThis.crypto?.randomUUID?.() || `candidate-${Date.now()}-${Math.random().toString(16).slice(2)}`, label: byId("candidate-label").value.trim(), areaKey: byId("candidate-area").value, housingPath: byId("candidate-path").value, status: byId("candidate-status").value, priceUsd: byId("candidate-price").value ? Number(byId("candidate-price").value) : null, url: byId("candidate-url").value.trim(), notes: byId("candidate-notes").value.trim() };
+  const latitude = byId("candidate-latitude").value ? Number(byId("candidate-latitude").value) : null; const longitude = byId("candidate-longitude").value ? Number(byId("candidate-longitude").value) : null;
+  const candidate = { id: globalThis.crypto?.randomUUID?.() || `candidate-${Date.now()}-${Math.random().toString(16).slice(2)}`, label: byId("candidate-label").value.trim(), areaKey: byId("candidate-area").value, housingPath: byId("candidate-path").value, status: byId("candidate-status").value, priceUsd: byId("candidate-price").value ? Number(byId("candidate-price").value) : null, url: byId("candidate-url").value.trim(), notes: byId("candidate-notes").value.trim(), latitude, longitude };
   state().envelope.plan.candidates.push(candidate);
   try { validateEnvelope(state().envelope); } catch (error) { state().envelope.plan.candidates.pop(); announce(`Candidate not added: ${error.message}`); return; }
-  event.target.reset(); byId("candidate-area").value = candidate.areaKey; scheduleSave(); renderCandidates(); renderMap(); announce(`${candidate.label} added to ${workspaceNames[activeWorkspace]}.`);
+  event.target.reset(); setPinPlacement(false); byId("candidate-area").value = candidate.areaKey; scheduleSave(); renderCandidates(); renderMap(); announce(`${candidate.label} added to ${workspaceNames[activeWorkspace]}.`);
 });
 
 byId("candidate-list").addEventListener("change", (event) => {
   const control = event.target; if (!isPrivate() || !control.dataset.candidateId) return; const candidate = state().envelope.plan.candidates.find((item) => item.id === control.dataset.candidateId); if (!candidate) return; const previous = candidate[control.dataset.candidateField]; let value = control.value; if (control.dataset.candidateField === "priceUsd") value = value === "" ? null : Number(value); candidate[control.dataset.candidateField] = value;
   try { validateEnvelope(state().envelope); scheduleSave(); renderMap(); } catch (error) { candidate[control.dataset.candidateField] = previous; control.value = previous ?? ""; announce(`Candidate change not kept: ${error.message}`); }
 });
-byId("candidate-list").addEventListener("click", (event) => { const button = event.target.closest("[data-remove-candidate]"); if (!button || !isPrivate()) return; const candidate = state().envelope.plan.candidates.find((item) => item.id === button.dataset.removeCandidate); if (!candidate || !window.confirm(`Remove “${candidate.label}” from ${workspaceNames[activeWorkspace]}?`)) return; state().envelope.plan.candidates = state().envelope.plan.candidates.filter((item) => item.id !== candidate.id); scheduleSave(); renderCandidates(); renderMap(); });
+byId("candidate-list").addEventListener("click", (event) => {
+  if (!isPrivate()) return;
+  const clearPoint = event.target.closest("[data-clear-candidate-point]");
+  if (clearPoint) { const candidate = state().envelope.plan.candidates.find((item) => item.id === clearPoint.dataset.clearCandidatePoint); if (!candidate) return; candidate.latitude = null; candidate.longitude = null; scheduleSave(); renderCandidates(); renderMap(); announce(`${candidate.label} now uses its approximate area point.`); return; }
+  const button = event.target.closest("[data-remove-candidate]"); if (!button) return; const candidate = state().envelope.plan.candidates.find((item) => item.id === button.dataset.removeCandidate); if (!candidate || !window.confirm(`Remove “${candidate.label}” from ${workspaceNames[activeWorkspace]}?`)) return; state().envelope.plan.candidates = state().envelope.plan.candidates.filter((item) => item.id !== candidate.id); scheduleSave(); renderCandidates(); renderMap();
+});
 
 byId("roadmap-list").addEventListener("change", (event) => {
   const control = event.target; if (!isPrivate() || !control.dataset.taskId) return; const task = state().envelope.plan.roadmap.find((item) => item.id === control.dataset.taskId); if (!task) return; const previous = task[control.dataset.taskField]; task[control.dataset.taskField] = control.dataset.taskField === "durationWeeks" ? Number(control.value) : control.value;
