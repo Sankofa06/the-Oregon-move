@@ -30,7 +30,7 @@
 | G105 Editable roadmap | A readable Gantt updates from target date, task duration, due date, owner, and status edits | deterministic tests + browser interaction | Pass — date/duration geometry tests and browser status edit passed; mobile chart is horizontally contained |
 | G106 Accessibility/responsiveness | New controls, map alternative, Gantt, and candidate notebook work at keyboard/mobile/desktop sizes | automated inspection + browser review | Pass — labeled text alternative, 390px/1280px review, no page overflow, private inputs/outputs visibly obscure, and clean console |
 | G107 Truth/traceability | Current material claims and outbound search/reference links are dated, scoped, and reachable | source registry + link checks | Pass with vendor caveat — adopted 2027–28 calendars corrected and linked; 21 links returned 200; other vendor pages returned bot-protection 403 rather than 404/DNS failures |
-| G108 Delivery | Exact accepted artifact is pushed, Pages run succeeds, live HTTPS returns 200, and no self-hosted billable-time rule is violated | git/GitHub/API/live checks | Pending |
+| G108 Delivery | Exact accepted artifact is pushed, Pages run succeeds, live HTTPS returns 200, and no self-hosted billable-time rule is violated | git/GitHub/API/live checks | Pass — accepted commit `c4d99dbb946be5e9f091a8e85757105acdf33c0a`; Pages run `33711242142` succeeded; live HTTPS returned 200 with v2 markers; timing API reported zero billable milliseconds |
 | G109 Couple clarity | A fresh reader can tell what is known, what is estimated, what differs between workspaces, and the next decision | fresh acceptance critic | Pass — fresh rc3 release critic returned GO with no severity 3/2/1 findings |
 
 ### V2 active risks
@@ -43,7 +43,7 @@
 
 ### V2 current state
 
-- State: ACCEPTED(rc3); fresh release criticism returned GO and only G108 deployment verification remains pending.
+- State: DELIVERED(v2); fresh release criticism returned GO and the exact accepted artifact passed GitHub Pages and live-site verification.
 - Canonical repository: this checkout, branch `main`, remote `origin`.
 - Frozen artifact identity: SHA-256 `8ec0a893d02628d2ae4636cd573882a98313e380f7dbd1453bc49b021549c23c` over `.gitignore`, `README.md`, and the sorted tracked delivery files under `docs/`, `landing-page/`, `scripts/`, and `.github/workflows/`.
 
@@ -56,6 +56,13 @@
 - V2-ISS-105 / assurance gap / repaired: `.gitignore` is included in the rc3 fingerprint scope.
 - V2-ISS-106 / privacy hardening / repaired and verified: the public illustrative household composition no longer mirrors the private family description, and the roadmap refers to district classes rather than household grade details; the targeted tracked-file scan is clean.
 - V2-ISS-107 / release acceptance / verified: a fresh critic independently matched the rc3 fingerprint, reran 20/20 tests and diff checks, exercised private-value hiding and My/Partner workspace isolation at desktop and mobile sizes, and returned GO with no material findings. One narrow-map employer label may truncate visually; the accessible adjacent area list retains the full label.
+
+### V2 delivery evidence
+
+- Accepted and deployed site commit: `c4d99dbb946be5e9f091a8e85757105acdf33c0a`.
+- GitHub Pages run: `33711242142`, completed successfully on September 2, 2026 Pacific time.
+- Live verification: `https://sankofa06.github.io/the-Oregon-move/` returned HTTPS 200 after deployment and contained the v2 dual-workspace, privacy-toggle, and editable-Gantt markers.
+- Compute evidence: no repository-scoped self-hosted runner was configured; this workflow used its declared GitHub-hosted Ubuntu runner, and the run timing API reported zero billable milliseconds.
 
 ## Commission and non-goals
 
