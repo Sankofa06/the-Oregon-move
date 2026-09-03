@@ -1,0 +1,12 @@
+/* Verification-driven accessibility and print corrections. */
+.status-cell input,
+.status-cell select,
+.focus-button {
+  min-height: 44px;
+}
+
+@media print {
+  body:not(.private-plan) .print-private-warning {
+    display: none;
+  }
+}
