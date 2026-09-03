@@ -6,9 +6,10 @@
 - Outcome: replace it with a real geographic slippy map that supports drag, wheel/button/keyboard zoom, selectable areas and job anchors, water and district context, optional exact candidate points, and Apple Maps place/directions links.
 - Privacy boundary: no geocoder, location permission, analytics, or private-model request. Visible raster tiles load from OpenStreetMap and therefore disclose ordinary network metadata and the viewed extent; the UI and private-data guide state that boundary.
 - Provider policy: normal interactive tile viewing only, with persistent attribution, browser caching, no prefetch, and no offline download.
-- State: VERIFIED LOCALLY; publication and exact Pages verification pending.
+- State: DELIVERED; the exact accepted map commit passed Pages and live browser verification.
 - DEC-108: this amendment supersedes DEC-103's schematic-only presentation while retaining local code, no remote scripts, `connect-src 'none'`, and no private input egress.
 - Local evidence: 23/23 deterministic tests; 12 area markers and four job anchors; OSM tiles loaded at 256px; button zoom changed from level 10 to 11; keyboard and pointer panning moved the tile plane; Beaverton selection updated the detail panel; a synthetic private candidate point produced a local marker and Apple Maps link; 1280px and 390px layouts had no page overflow; no browser warnings or errors.
+- Delivery evidence: site commit `5bc3dcac1db7d15310c5501bc7f01f94ab16629f`; Pages run `33715706864` succeeded; live HTTPS returned 200; the deployed browser loaded all sampled tiles at 256px, exposed 12 area markers, four job markers, and two Apple Maps links with no warnings or errors; Actions timing reported zero billable milliseconds.
 
 ## V2 commission — September 2, 2026
 
