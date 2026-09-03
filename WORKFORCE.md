@@ -76,6 +76,7 @@
 - ISS-009 / S1 LOCAL / applied and directly verified: the visually hidden file input received keyboard focus without a visible proxy. Import is a native visible button covered by the global focus indicator; it opens a labeled file input removed from sequential focus.
 - ISS-010 / S1 LOCAL / applied and directly verified: UI ranges were looser than envelope validation, allowing values that could be stored but rejected on reload. Field bounds match the schema, every debounced write validates before storage, and a live 51-year input produced `aria-invalid` with the 1–50-year correction.
 - ISS-011 / S2 MATERIAL / applied and directly verified: the document-level numeric/date input handler also received checkbox input events and re-rendered stale preferences before checkbox change handlers ran. It returns for non-model/non-path controls, `scripts/check.sh` asserts the routing guard, and the browser regression verified save on, saved status, hide on/off, save off, memory-only status, and illustrative mode after reload.
+- ISS-012 / S1 LOCAL / applied; delivery re-verification pending: the first GitHub-hosted Pages run passed all 11 tests but the privacy scan could not start because `rg` was absent. The verification script now prefers `rg` and falls back to recursive `grep` with equivalent regex/fixed-string modes.
 
 ## Pending authority / next action
 

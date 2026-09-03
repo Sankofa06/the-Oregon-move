@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ -z "${OREGON_CHECK_FORCE_GREP:-}" ]] && command -v rg >/dev/null 2>&1; then
+  search() { rg "$@"; }
+  search_fixed() { rg -F "$@"; }
+else
+  search() { grep -ER "$@"; }
+  search_fixed() { grep -FR "$@"; }
+fi
+
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
@@ -26,7 +34,7 @@ node --test scripts/model.test.mjs
 scan_targets=(landing-page scripts .github/workflows README.md docs AGENTS.md WORKFORCE.md)
 
 absolute_pattern='/''Users/|file:''//'
-if rg -n "$absolute_pattern" "${scan_targets[@]}"; then
+if search -n "$absolute_pattern" "${scan_targets[@]}"; then
   echo "Privacy failure: absolute local path found." >&2
   exit 1
 fi
@@ -36,53 +44,53 @@ if find . -type f -name 'oregon-move-private-plan-*.json' -print -quit | grep -q
   exit 1
 fi
 
-if rg -n -i '(<script[^>]+src="https?://|@import[[:space:]]+url|fonts\.(googleapis|gstatic))' landing-page; then
+if search -n -i '(<script[^>]+src="https?://|@import[[:space:]]+url|fonts\.(googleapis|gstatic))' landing-page; then
   echo "Static-site failure: remote script or font dependency found." >&2
   exit 1
 fi
 
-if rg -n '\b(fetch|XMLHttpRequest|WebSocket|sendBeacon)\b' landing-page; then
+if search -n '\b(fetch|XMLHttpRequest|WebSocket|sendBeacon)\b' landing-page; then
   echo "Privacy failure: unexpected outbound-request API found." >&2
   exit 1
 fi
 
-if rg -n -i '(google-analytics|googletagmanager|segment\.com|mixpanel|amplitude|hotjar|telemetry)' landing-page; then
+if search -n -i '(google-analytics|googletagmanager|segment\.com|mixpanel|amplitude|hotjar|telemetry)' landing-page; then
   echo "Privacy failure: analytics or telemetry marker found." >&2
   exit 1
 fi
 
-if rg -n '(src|href)="/|url\(/' landing-page; then
+if search -n '(src|href)="/|url\(/' landing-page; then
   echo "Pages failure: root-relative asset URL found." >&2
   exit 1
 fi
 
-if rg -n 'innerHTML|insertAdjacentHTML|document\.write' landing-page; then
+if search -n 'innerHTML|insertAdjacentHTML|document\.write' landing-page; then
   echo "Safety failure: unsafe HTML injection API found." >&2
   exit 1
 fi
 
-rg -q "connect-src 'none'" landing-page/index.html
-rg -q 'Save on this device' landing-page/index.html
-rg -q 'Browser storage is not a vault' landing-page/index.html
-rg -q 'Illustrative example' landing-page/index.html
-rg -q 'View source on GitHub' landing-page/index.html
-rg -Fq 'if (!input.dataset.modelPath && !input.dataset.path) return;' landing-page/app.mjs
-rg -Fq 'byId("hide-values").addEventListener("change"' landing-page/app.mjs
-rg -Fq 'byId("save-device").addEventListener("change"' landing-page/app.mjs
+search -q "connect-src 'none'" landing-page/index.html
+search -q 'Save on this device' landing-page/index.html
+search -q 'Browser storage is not a vault' landing-page/index.html
+search -q 'Illustrative example' landing-page/index.html
+search -q 'View source on GitHub' landing-page/index.html
+search_fixed -q 'if (!input.dataset.modelPath && !input.dataset.path) return;' landing-page/app.mjs
+search_fixed -q 'byId("hide-values").addEventListener("change"' landing-page/app.mjs
+search_fixed -q 'byId("save-device").addEventListener("change"' landing-page/app.mjs
 
 workflow=.github/workflows/pages.yml
 for action in 'actions/checkout@v7' 'actions/configure-pages@v6' 'actions/upload-pages-artifact@v5' 'actions/deploy-pages@v5'; do
-  rg -q "$action" "$workflow" || { echo "Workflow failure: missing $action" >&2; exit 1; }
+  search -q "$action" "$workflow" || { echo "Workflow failure: missing $action" >&2; exit 1; }
 done
-rg -q 'contents: read' "$workflow"
-rg -q 'pages: write' "$workflow"
-rg -q 'id-token: write' "$workflow"
-rg -q 'path: landing-page' "$workflow"
-rg -q 'name: github-pages' "$workflow"
-rg -q 'group: pages' "$workflow"
-rg -q 'cancel-in-progress: false' "$workflow"
-rg -q 'persist-credentials: false' "$workflow"
-if rg -q 'pull_request' "$workflow"; then
+search -q 'contents: read' "$workflow"
+search -q 'pages: write' "$workflow"
+search -q 'id-token: write' "$workflow"
+search -q 'path: landing-page' "$workflow"
+search -q 'name: github-pages' "$workflow"
+search -q 'group: pages' "$workflow"
+search -q 'cancel-in-progress: false' "$workflow"
+search -q 'persist-credentials: false' "$workflow"
+if search -q 'pull_request' "$workflow"; then
   echo "Workflow failure: pull_request must not trigger this workflow." >&2
   exit 1
 fi
